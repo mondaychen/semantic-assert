@@ -95,7 +95,10 @@ five API requests.
 Assertions send captured state to the configured provider. Use the Playwright
 adapter's `redact` hook to remove sensitive data. Keep API keys server-side.
 Model judgments are probabilistic: calibrate thresholds for your provider and
-use ordinary assertions for exact strings, counting, and arithmetic.
+use ordinary assertions for exact strings, counting, and arithmetic. Cost in
+the usage report is an estimate from rates you configure on the provider
+(`usdPerMtokInput` for TypeSafe, `pricing` for the AI SDK); it reads `n/a`
+until you set them.
 
 ## Examples
 
