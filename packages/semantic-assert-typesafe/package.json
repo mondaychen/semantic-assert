@@ -1,0 +1,53 @@
+{
+  "name": "semantic-assert-typesafe",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "TypeSafe (Jev) provider for semantic-assert, powered by the official TypeSafe SDK with retries and per-call cost.",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "lint": "oxlint --type-aware --deny-warnings .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepack": "pnpm run build"
+  },
+  "dependencies": {
+    "@typesafe-ai/sdk": "^0.6.0",
+    "semantic-assert": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.17",
+    "oxlint": "1.50.0",
+    "oxlint-tsgolint": "^0.17.3",
+    "tsup": "^8.5.0",
+    "typescript": "5.7.3",
+    "vitest": "^4.1.11"
+  },
+  "module": "./dist/index.js",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "name": "semantic-assert-playwright",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Playwright adapter for semantic-assert: page capture via aria snapshots, a scenario fixture, expect matchers, and a usage reporter.",
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./reporter": {
+      "import": {
+        "types": "./dist/reporter.d.ts",
+        "default": "./dist/reporter.js"
+      },
+      "require": {
+        "types": "./dist/reporter.d.cts",
+        "default": "./dist/reporter.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "lint": "oxlint --type-aware --deny-warnings .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepack": "pnpm run build"
+  },
+  "dependencies": {
+    "semantic-assert": "workspace:^"
+  },
+  "peerDependencies": {
+    "@playwright/test": ">=1.50.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.58.1",
+    "@types/node": "^22.15.17",
+    "typescript": "5.7.3",
+    "vitest": "^4.1.11",
+    "tsup": "^8.5.0",
+    "oxlint": "1.50.0",
+    "oxlint-tsgolint": "^0.17.3"
+  },
+  "module": "./dist/index.js",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

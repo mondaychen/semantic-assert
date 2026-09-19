@@ -1,0 +1,44 @@
+# Publishing packages
+
+The repository root is private. Only the three packages under `packages/` are
+published. Their initial version is `0.1.0`; subsequent releases are tracked
+independently with Changesets.
+
+## First release
+
+- Confirm the npm names are available to the publishing account. They currently
+  use `semantic-assert`, `semantic-assert-typesafe`, and `semantic-assert-playwright`.
+- Add the actual public repository URL, homepage, and issue tracker to the package
+  manifests once the remote exists. No placeholder owner is embedded in this repo.
+- Run `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm check:packages`, and
+  the browser smoke test described in the README.
+- Authenticate to npm and run `pnpm release` when ready to publish.
+
+The source retains its original copyright attribution and is licensed under
+the Apache License, Version 2.0.
+
+## Subsequent releases
+
+1. Run `pnpm changeset` and select only the packages affected by your change.
+2. Commit the resulting changeset with the implementation.
+3. Run `pnpm version:packages` to apply versions and generate changelogs. Review
+   dependency range updates, then run `pnpm install` and commit the release changes.
+4. Run `pnpm release` from a clean checkout after review. It verifies the repository
+   and packed consumers before Changesets publishes unpublished package versions.
+
+Use pnpm for manual packing or publishing. It rewrites `workspace:^` dependencies
+to ordinary semver ranges in the tarball. The TypeSafe and Playwright packages
+depend on the separately published core; each tarball contains only its own build,
+README, manifest, and license. `prepack` rebuilds the selected package. Build the
+workspace first if packing an adapter directly from a clean checkout.
+
+To inspect one package without publishing:
+
+```sh
+pnpm build
+pnpm --filter semantic-assert-playwright pack --pack-destination ../../artifacts
+```
+
+After publishing, update the original app to use the published versions and remove
+the old internal packages in that app's repository. The extraction here does not
+modify the original app or include its staging fixtures and credentials.

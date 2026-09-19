@@ -1,0 +1,7 @@
+node_modules
+dist
+.turbo
+artifacts
+pnpm-lock.yaml
+test-results
+playwright-report

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.turbo/
+artifacts/
+test-results/
+playwright-report/
+.env
+.env.*
+!.env.example
+*.tgz
+.DS_Store
