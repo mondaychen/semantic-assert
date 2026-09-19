@@ -87,8 +87,8 @@ See the [AI SDK provider guide](packages/semantic-assert-ai-sdk/README.md) for o
 and the [Playwright guide](packages/semantic-assert-playwright/README.md) for UI tests.
 
 To try the checked-out repository before publication, follow the
-[runnable examples guide](examples/README.md). With `AI_GATEWAY_API_KEY` in the
-root `.env`, run `pnpm install`, `pnpm exec playwright install chromium`, and
+[runnable examples guide](examples/README.md). Copy `.env.example` to `.env`,
+fill in `AI_GATEWAY_API_KEY`, then run `pnpm install`, `pnpm exec playwright install chromium`, and
 `pnpm examples:gateway --smoke` to try five core and browser tests using at most
 five API requests.
 
