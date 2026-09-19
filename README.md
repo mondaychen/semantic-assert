@@ -131,8 +131,9 @@ temporary artifacts available for inspection.
 The browser smoke test uses a local page and needs no credentials. A second
 smoke test runs against TypeSafe only when `TYPESAFE_API_KEY` is set; the AI Gateway
 smoke test runs only when `AI_GATEWAY_API_KEY` is set. CI runs
-offline-provider checks on Node 22 and 24; a manual workflow run also exercises
-TypeSafe and AI Gateway when their repository secrets are configured.
+offline-provider checks on Node 22 and 24; a nightly schedule and manual
+workflow runs also exercise TypeSafe and AI Gateway when their repository
+secrets are configured.
 
 ## Releases
 

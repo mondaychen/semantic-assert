@@ -3,8 +3,15 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  schedule:
+    # Nightly, so drift in the experimental AI SDK or the TypeSafe API
+    # shows up before a release does.
+    - cron: "17 3 * * *"
 permissions:
   contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -25,7 +32,7 @@ jobs:
       - run: pnpm test:integration
       - run: pnpm examples:playwright
   live-provider:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
     runs-on: ubuntu-latest
     env:
       TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
