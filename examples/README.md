@@ -84,10 +84,25 @@ the default examples show `n/a`. Choice confidence is the selected option's
 probability; it differs from the direct TypeSafe provider's native confidence.
 The failure-evidence example continues to use a scripted provider.
 
-### Pace requests on the free tier
+### Try five tests on the free tier
 
-With the key in `.env`, this command runs both suites sequentially with no
-intentional delay by default:
+With `AI_GATEWAY_API_KEY` in the root `.env`, run this small selection first:
+
+```sh
+pnpm examples:gateway --smoke
+```
+
+It runs five tests: ticket routing, response quality, checkout, error-message
+redaction, and document highlighting. Each test makes one API request, batching
+related claims. The complete run uses **five API requests**.
+
+Install Chromium with `pnpm exec playwright install chromium` before running
+browser examples. Recent requests to the same model also count toward your
+account's rate limit.
+
+### Run the full suite
+
+With the key in `.env`, run all core and browser examples:
 
 ```sh
 pnpm examples:gateway
@@ -101,19 +116,9 @@ live evaluation, including each polling attempt. Set the delay in milliseconds
 EXAMPLE_REQUEST_DELAY_MS=60000 pnpm examples:gateway
 ```
 
-The runner loads the root `.env`, uses one Node test process at a time and one
-Playwright worker, and runs the core suite before the browser suite. Core failure
-stops the runner before the browser suite; the browser suite stops on its first
-failure. Don't run multiple live suites simultaneously with the same account.
-
-With pacing enabled, the example provider disables SDK retries so a `429` fails
-without a burst of short-backoff requests. Assertion and browser-test timeouts
-grow to accommodate the pauses. Fake examples remain immediate. Reported provider
-wait time includes this intentional pause.
-
 `EXAMPLE_REQUEST_DELAY_MS` also works with the individual example commands for
 either live provider. When invoking Node directly, include `--test-concurrency=1`.
-The published provider packages themselves do not add any delay.
+Run one live suite at a time to keep requests within your account's rate limit.
 
 The example delay is a starting point, not a guaranteed limit. Vercel does not
 publish fixed per-model numbers; if a run still gets a `429`, wait for the limit

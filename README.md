@@ -97,7 +97,8 @@ and the [Playwright guide](packages/semantic-assert-playwright/README.md) for UI
 To try the checked-out repository before publication, follow the
 [runnable examples guide](examples/README.md). With `AI_GATEWAY_API_KEY` in the
 root `.env`, run `pnpm install`, `pnpm exec playwright install chromium`, and
-`pnpm examples:gateway` to exercise both core and browser examples.
+`pnpm examples:gateway --smoke` to try five core and browser tests using at most
+five API requests.
 
 Assertions send captured state to the configured provider. Use the Playwright
 adapter's `redact` hook to remove sensitive data. Keep API keys server-side.
@@ -112,9 +113,9 @@ tests for checkout, error messages, search states, and document highlights.
 Run `pnpm examples:core` or `pnpm examples:playwright` after installing workspace
 dependencies (and Chromium for browser examples). Both default to scripted
 providers with no API key; the guide also shows how to opt into TypeSafe or AI Gateway.
-`pnpm examples:gateway` loads `.env` and runs live Gateway examples serially with
-no delay by default. Free-tier users can opt into request pacing with
-`EXAMPLE_REQUEST_DELAY_MS` to reduce rate-limit errors.
+`pnpm examples:gateway --smoke` loads `.env` and selects five live tests, capped
+at five API requests. This is a smaller starting point for free-tier users.
+Run `pnpm examples:gateway` for the full suite.
 
 ## Development
 

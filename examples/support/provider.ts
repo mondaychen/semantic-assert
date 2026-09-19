@@ -8,7 +8,7 @@ import {
 } from "semantic-assert";
 import { typesafe } from "semantic-assert-typesafe";
 import { aiSdk } from "semantic-assert-ai-sdk";
-import { requestDelayMs } from "./timing.js";
+import { requestDelayMs, singlePass } from "./timing.js";
 
 function paced(provider: Provider): Provider {
   if (requestDelayMs === 0) return provider;
@@ -31,12 +31,12 @@ export function exampleProvider(fake: FakeProviderOptions): Provider {
     if (!process.env.AI_GATEWAY_API_KEY) {
       throw new Error("Set AI_GATEWAY_API_KEY before using EXAMPLE_PROVIDER=ai-sdk");
     }
-    // Paced runs fail on a 429 instead of sending the SDK's short-backoff retries.
-    return paced(aiSdk({ maxRetries: requestDelayMs > 0 ? 0 : undefined }));
+    // Smoke and paced runs do not spend extra requests on SDK retries.
+    return paced(aiSdk({ maxRetries: singlePass || requestDelayMs > 0 ? 0 : undefined }));
   }
   if (mode !== "typesafe") throw new Error("EXAMPLE_PROVIDER must be fake, typesafe, or ai-sdk");
   if (!process.env.TYPESAFE_API_KEY) {
     throw new Error("Set TYPESAFE_API_KEY before using EXAMPLE_PROVIDER=typesafe");
   }
-  return paced(typesafe({ maxRetries: requestDelayMs > 0 ? 0 : undefined }));
+  return paced(typesafe({ maxRetries: singlePass || requestDelayMs > 0 ? 0 : undefined }));
 }
