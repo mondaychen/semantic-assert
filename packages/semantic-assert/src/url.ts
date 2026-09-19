@@ -3,13 +3,17 @@
 
 import type { JsonValue } from "./types";
 
-/** URL broken into the pieces a question can point at by name. */
+/**
+ * URL broken into the pieces a question can point at by name. A query key
+ * that repeats (`?tag=a&tag=b`) is reported as a list of its values.
+ */
 export function describeUrl(rawUrl: string): { [key: string]: JsonValue } {
   const url = new URL(rawUrl);
   const query_params: { [key: string]: JsonValue } = {};
-  url.searchParams.forEach((value, key) => {
-    query_params[key] = value;
-  });
+  for (const key of new Set(url.searchParams.keys())) {
+    const values = url.searchParams.getAll(key);
+    query_params[key] = values.length === 1 ? values[0]! : values;
+  }
   return {
     url: rawUrl,
     pathname: url.pathname,

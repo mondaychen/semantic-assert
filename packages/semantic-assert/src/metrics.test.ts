@@ -85,6 +85,13 @@ describe("url helpers", () => {
     });
   });
 
+  it("keeps every value of a repeated query key", () => {
+    expect(describeUrl("https://x.test/s?tag=a&tag=b&q=1").query_params).toEqual({
+      tag: ["a", "b"],
+      q: "1",
+    });
+  });
+
   it("truncates with a marker", () => {
     expect(truncateText("abc", 5)).toEqual({ text: "abc", truncated: false });
     const cut = truncateText("abcdefgh", 3);
