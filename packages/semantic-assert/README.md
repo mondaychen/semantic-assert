@@ -23,7 +23,8 @@ interface Provider {
 
 A provider answers Noul (yes/no probability) and Choice (option distribution
 plus confidence) questions about one state, all questions in one call, and
-reports the model id, token usage and its own cost. `FakeProvider` ships here
+reports the model id, token usage and, when it has rates to estimate from, its
+cost. `FakeProvider` ships here
 for tests: scripted answers per call, and it records every request.
 
 ## Judge

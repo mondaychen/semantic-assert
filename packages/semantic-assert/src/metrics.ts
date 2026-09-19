@@ -12,7 +12,7 @@ export interface CallMetrics {
   waitMs: number;
   /** Attempts the provider reported; 1 when it did not retry. */
   attempts: number;
-  /** Cost as priced by the provider; undefined when the provider does not know. */
+  /** Cost estimated by the provider from configured rates; undefined when unknown. */
   costUsd?: number;
 }
 
@@ -29,7 +29,7 @@ export interface UsageTotals {
   outputTokens: number;
   waitMs: number;
   retries: number;
-  /** Sum of provider-reported costs; null when no call reported one. */
+  /** Sum of provider cost estimates; null when no call reported one. */
   costUsd: number | null;
 }
 
@@ -177,7 +177,7 @@ export function renderUsage(summary: UsageSummary, groupLabel = "Group"): string
     )
     .join("\n");
   return [
-    `Semantic assertions usage (model ${summary.models.join(", ")}; average provider wait ${formatMs(avgWait)} per call; cost as reported by the provider)`,
+    `Semantic assertions usage (model ${summary.models.join(", ")}; average provider wait ${formatMs(avgWait)} per call; cost estimated by the provider from configured rates, n/a when unknown)`,
     renderTable(rows),
     "Per scenario:",
     perScenario,

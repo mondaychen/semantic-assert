@@ -79,7 +79,7 @@ EXAMPLE_PROVIDER=ai-sdk node --env-file=.env node_modules/@playwright/test/cli.j
 ```
 
 Live requests require an enabled AI Gateway account and incur provider usage.
-The Gateway provider reports cost only when explicit pricing is configured, so
+Both live providers report cost only when explicit pricing is configured, so
 the default examples show `n/a`. Choice confidence is the selected option's
 probability; it differs from the direct TypeSafe provider's native confidence.
 The failure-evidence example continues to use a scripted provider.

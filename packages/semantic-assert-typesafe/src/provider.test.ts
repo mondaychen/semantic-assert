@@ -42,6 +42,26 @@ describe("TypeSafeProvider", () => {
     });
   });
 
+  it("reports cost as unknown unless a rate is configured", async () => {
+    const body = JSON.stringify({
+      model: "m",
+      answers: { a: { type: "noul", noul: 0.9 } },
+      usage: { input_tokens: 1_000_000, output_tokens: 0 },
+    });
+    const fetchMock = vi.fn<FetchLike>().mockImplementation(async () => new Response(body));
+    const unpriced = await typesafe({ apiKey: "k", fetch: fetchMock }).evaluate("s", {
+      a: noul("q"),
+    });
+    expect(unpriced.costUsd).toBeUndefined();
+
+    vi.stubEnv("TYPESAFE_USD_PER_MTOK_INPUT", "0.05");
+    const priced = await typesafe({ apiKey: "k", fetch: fetchMock }).evaluate("s", {
+      a: noul("q"),
+    });
+    expect(priced.costUsd).toBeCloseTo(0.05);
+    expect(() => typesafe({ usdPerMtokInput: -1 })).toThrow(/usdPerMtokInput/);
+  });
+
   it("reports attempts per call, even when calls overlap", async () => {
     const ok = (model: string) =>
       new Response(

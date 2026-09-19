@@ -14,8 +14,12 @@ const provider = typesafe({
 });
 ```
 
-The provider reports cost per call from input tokens, because Jev bills input
-tokens only ($0.042 per million for Jev 1.13 as documented on 2026-09-17).
+Cost is unknown by default. Set `usdPerMtokInput` (or `TYPESAFE_USD_PER_MTOK_INPUT`)
+to your current rate and the provider estimates each call's cost from input
+tokens, because Jev bills input tokens only. For reference, Jev 1.13 was listed at
+$0.042 per million input tokens on 2026-09-17; check
+[docs.typesafe.ai/models](https://docs.typesafe.ai/models) for the current price.
+The estimate is not an invoice.
 
 Requests use the official [`@typesafe-ai/sdk`](https://docs.typesafe.ai/sdk/javascript).
 The `typesafe()` factory and its options are unchanged, including lazy API-key

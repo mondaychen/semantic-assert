@@ -109,8 +109,8 @@ reporter: [["list"], ["semantic-assert-playwright/reporter", { outputFile: "test
 ```
 
 Prints tokens, cost and provider wait per describe block (the Feature for
-playwright-bdd) and per scenario, and writes the same as JSON. Cost is whatever
-the provider reports per call; "n/a" when it reports none.
+playwright-bdd) and per scenario, and writes the same as JSON. Cost is the
+provider's per-call estimate from the rates you configured; "n/a" when none.
 
 ## Tests
 

@@ -5,22 +5,25 @@ import type { JsonValue, Provider, ProviderResult, Questions } from "semantic-as
 
 import { JevClient, type JevClientOptions } from "./client";
 
-/**
- * USD per million input tokens. Jev 1.13 is $0.042/Mtok with free output
- * tokens (docs.typesafe.ai/models, read 2026-09-17). Override with the
- * `usdPerMtokInput` option or TYPESAFE_USD_PER_MTOK_INPUT.
- */
-export const DEFAULT_USD_PER_MTOK_INPUT = 0.042;
-
 export interface TypeSafeProviderOptions extends Omit<JevClientOptions, "onCall"> {
-  /** Input-token price used for the per-call cost. */
+  /**
+   * USD per million input tokens, used to estimate each call's cost. Jev bills
+   * input tokens only. Defaults to TYPESAFE_USD_PER_MTOK_INPUT; when neither is
+   * set, cost is reported as unknown rather than estimated from a price that
+   * may be stale.
+   */
   usdPerMtokInput?: number;
 }
 
-function readPrice(override?: number): number {
-  if (override !== undefined) return override;
+function readPrice(override?: number): number | undefined {
+  if (override !== undefined) {
+    if (!Number.isFinite(override) || override < 0) {
+      throw new Error(`usdPerMtokInput must be a non-negative number, got ${override}`);
+    }
+    return override;
+  }
   const raw = process.env.TYPESAFE_USD_PER_MTOK_INPUT?.trim();
-  if (!raw) return DEFAULT_USD_PER_MTOK_INPUT;
+  if (!raw) return undefined;
   const value = Number(raw);
   if (!Number.isFinite(value) || value < 0) {
     throw new Error(`TYPESAFE_USD_PER_MTOK_INPUT must be a non-negative number, got "${raw}"`);
@@ -32,7 +35,7 @@ function readPrice(override?: number): number {
 export class TypeSafeProvider implements Provider {
   readonly name = "typesafe";
   private readonly clientOptions: Omit<JevClientOptions, "onCall">;
-  private readonly usdPerMtokInput: number;
+  private readonly usdPerMtokInput: number | undefined;
   private clientInstance: JevClient | undefined;
 
   constructor(options: TypeSafeProviderOptions = {}) {
@@ -57,7 +60,9 @@ export class TypeSafeProvider implements Provider {
       model: result.model,
       usage: { inputTokens: result.usage.input_tokens, outputTokens: result.usage.output_tokens },
       // Jev bills input tokens only.
-      costUsd: (result.usage.input_tokens / 1_000_000) * this.usdPerMtokInput,
+      ...(this.usdPerMtokInput === undefined
+        ? {}
+        : { costUsd: (result.usage.input_tokens / 1_000_000) * this.usdPerMtokInput }),
       attempts: result.attempts,
     };
   }
