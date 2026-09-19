@@ -1,8 +1,8 @@
 # Publishing packages
 
 The repository root and examples workspace are private. Only the four packages under `packages/` are
-published. Their initial version is `0.1.0`; subsequent releases are tracked
-independently with Changesets.
+published. The first published version is `0.2.0`; subsequent releases are
+tracked independently with Changesets.
 
 ## First release
 
@@ -28,7 +28,7 @@ The source is licensed under the Apache License, Version 2.0.
 Use pnpm for manual packing or publishing. It rewrites `workspace:^` dependencies
 to ordinary semver ranges in the tarball. The TypeSafe, AI SDK, and Playwright packages
 depend on the separately published core; each tarball contains only its own build,
-README, manifest, and license. `prepack` rebuilds the selected package. Build the
+README, changelog, manifest, and license. `prepack` rebuilds the selected package. Build the
 workspace first if packing an adapter directly from a clean checkout.
 
 To inspect one package without publishing:

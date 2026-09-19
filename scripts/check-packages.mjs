@@ -37,8 +37,11 @@ for (const name of names) {
   const entries = execFileSync("tar", ["-tf", tarball], { encoding: "utf8" }).trim().split("\n");
   assert(entries.includes("package/LICENSE"));
   assert(entries.includes("package/README.md"));
+  assert(entries.includes("package/CHANGELOG.md"));
   assert(
-    entries.every((entry) => /^package\/(dist\/|package.json$|README.md$|LICENSE$)/.test(entry)),
+    entries.every((entry) =>
+      /^package\/(dist\/|package.json$|README.md$|CHANGELOG.md$|LICENSE$)/.test(entry),
+    ),
   );
   assert(entries.every((entry) => !entry.includes(".test.")));
   for (const conditions of Object.values(packed.exports)) {
