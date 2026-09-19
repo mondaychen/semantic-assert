@@ -6,4 +6,5 @@ export * from "./context";
 export * from "./fixtures";
 export * from "./matchers";
 export * from "./page-state";
+export * from "./page-templates";
 export * from "./visual-hints";

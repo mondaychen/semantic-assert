@@ -5,7 +5,7 @@ import { type ChoiceQuestion, type NoulQuestion, choice, noul } from "./types";
 
 /**
  * How a plain-English claim becomes a Noul question. Models read instructions
- * literally, so the default names the state fields to look at and defines
+ * literally, so a template should name the state fields to look at and define
  * both outcomes. Override to change wording, language, or state layout.
  */
 export type ClaimTemplate = (claim: string) => NoulQuestion;
@@ -17,24 +17,29 @@ export type ClassificationTemplate = <Option extends string>(
 ) => ChoiceQuestion<Option>;
 
 export interface JudgeTemplates {
-  /** Claims about a captured page (state has `aria_snapshot`, `url`, `title`, optional `links` and `visual_hints`). */
-  pageClaim: ClaimTemplate;
+  /** Claims about whatever JSON state the caller captured. */
+  claim: ClaimTemplate;
   /** Claims about a parsed URL (state from `describeUrl`). */
   urlClaim: ClaimTemplate;
   classification: ClassificationTemplate;
 }
 
+/**
+ * Defaults that assume nothing about the state's shape. Adapters that capture
+ * a known layout (a web page, say) supply templates naming its fields, which
+ * helps the model considerably.
+ */
 export const defaultTemplates: JudgeTemplates = {
-  pageClaim: (claim) =>
+  claim: (claim) =>
     noul(
       {
         statement: claim,
         question:
-          "Is `statement` true of the web page captured in the state? Judge only from `aria_snapshot` (the page's accessibility tree), `url`, `title`, and when present `links` (link names and hrefs) and `visual_hints` (how text elements look: highlighted background, bold, dimmed, struck through, colour, data attributes).",
+          "Is `statement` supported by the supplied JSON state? Use only that state as evidence.",
       },
       {
-        true: "The captured page clearly shows the statement holds.",
-        false: "The captured page does not show it, or shows the opposite.",
+        true: "The state clearly shows the statement holds.",
+        false: "The state does not show it, or shows the opposite.",
       },
     ),
   urlClaim: (claim) =>
@@ -53,7 +58,7 @@ export const defaultTemplates: JudgeTemplates = {
     choice(
       {
         question: instructions,
-        note: "Judge only from `aria_snapshot` (the page's accessibility tree), `url`, `title`, and `visual_hints` when present.",
+        note: "Classify using only the supplied JSON state as evidence.",
       },
       criteria,
     ),

@@ -22,6 +22,7 @@ import {
 } from "semantic-assert";
 
 import { type CapturePageStateOptions, capturePageState } from "./page-state";
+import { pageTemplates } from "./page-templates";
 
 export interface PageAssertOptions extends CapturePageStateOptions, ExpectClaimsOptions {}
 export interface PageClassifyOptions<Option extends string>
@@ -45,7 +46,10 @@ export class PageJudge {
     provider: Provider,
     options: PageJudgeOptions = {},
   ) {
-    this.settings = resolveJudgeSettings(options);
+    this.settings = resolveJudgeSettings({
+      ...options,
+      templates: { ...pageTemplates, ...options.templates },
+    });
     this.judge = new Judge({
       provider,
       settings: this.settings,

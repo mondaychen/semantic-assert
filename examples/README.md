@@ -33,9 +33,9 @@ Fake token counts are sample values, and cost is unknown.
 | [Search page classification](playwright/classification.spec.ts) | Distinguish loading, results, empty, and error states                                           |
 | [Document styling](playwright/visual-matchers.spec.ts)          | Locator matchers, negative claims, and visual hints for highlights and struck-through text      |
 
-The shared [JSON judge](support/json-judge.ts) supplies templates that reference
-arbitrary JSON. The library's built-in templates refer to web-page fields such as
-`aria_snapshot`; replace them when judging your own data. The
+The shared [JSON judge](support/json-judge.ts) builds a core `Judge` with the
+built-in templates, which describe arbitrary JSON. The Playwright adapter
+applies its own templates naming web-page fields such as `aria_snapshot`. The
 [provider helper](support/provider.ts) selects fake, TypeSafe, or AI SDK explicitly.
 
 ## Run with TypeSafe

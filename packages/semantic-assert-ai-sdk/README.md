@@ -22,9 +22,9 @@ console.log(answers.actionable.noul);
 ```
 
 Use `aiSdk()` anywhere a `Provider` is accepted, including Playwright's
-`judgeProvider` fixture and `createJudgeExpect`. For `expectClaims` over arbitrary
-JSON, supply a suitable claim template as in the [JSON examples](../../examples/support/json-judge.ts).
-The core's default templates describe captured web pages.
+`judgeProvider` fixture and `createJudgeExpect`. The core's default templates
+describe arbitrary JSON, so `expectClaims` works over API responses as-is; see
+the [JSON examples](../../examples/support/json-judge.ts).
 
 ## Configuration
 

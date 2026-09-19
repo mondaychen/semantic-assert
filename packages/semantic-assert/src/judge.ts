@@ -58,7 +58,7 @@ export interface TimingOptions {
 export interface ExpectClaimsOptions extends TimingOptions {
   /** Pass threshold for every claim that has none of its own. */
   threshold?: number;
-  /** Question wording; defaults to the page-claim template. */
+  /** Question wording; defaults to the settings' `claim` template. */
   template?: ClaimTemplate;
 }
 
@@ -178,7 +178,7 @@ export class Judge {
       if (own !== undefined) assertValidThreshold(own, `claim "${claim}"`);
     }
     const { timeoutMs, pollIntervalMs } = this.timing(options);
-    const template = options.template ?? this.settings.templates.pageClaim;
+    const template = options.template ?? this.settings.templates.claim;
     const questions = Object.fromEntries(
       claims.map(({ claim }, i) => [`claim_${i}`, template(claim)]),
     );

@@ -53,7 +53,9 @@ export const { Given, When, Then } = createBdd(test);
 ```
 
 `judgeOptions` accepts everything `resolveJudgeSettings` does: thresholds,
-timing, state size and question templates. It is plain data, so it can live in
+timing, state size and question templates. The adapter applies `pageTemplates`,
+which name the captured page's fields, on top of the core defaults; pass
+`templates` to replace any of them. It is plain data, so it can live in
 the config's `use` for the whole suite, or in `test.use` per file or describe
 block. `judgeProvider` is given where `test` is built, as above. Each call can still override
 `threshold`, `timeoutMs`, `pollIntervalMs`, `region` (Locator or selector),

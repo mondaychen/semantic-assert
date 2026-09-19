@@ -59,8 +59,10 @@ the optional `attach` hook for the test report.
 `SEMANTIC_ASSERT_THRESHOLD`, `SEMANTIC_ASSERT_TIMEOUT_MS`,
 `SEMANTIC_ASSERT_POLL_MS`, `SEMANTIC_ASSERT_MAX_STATE_CHARS`, then defaults of
 0.7, 15 s, 1 s and 40,000 characters. Thresholds must be in [0.5, 1]. The
-question templates that wrap a claim are part of the settings and can be
-replaced per provider or language.
+question templates that wrap a claim are part of the settings. The defaults
+describe arbitrary JSON state; adapters that capture a known layout (such as
+the Playwright package) supply templates naming its fields, and any template
+can be replaced per provider or language.
 
 ## Calibration
 

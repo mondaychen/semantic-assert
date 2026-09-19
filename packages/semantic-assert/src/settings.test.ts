@@ -52,9 +52,9 @@ describe("resolveJudgeSettings", () => {
 
   it("merges partial template overrides", () => {
     const s = resolveJudgeSettings({
-      templates: { pageClaim: (c) => ({ type: "noul", instructions: c }) },
+      templates: { claim: (c) => ({ type: "noul", instructions: c }) },
     });
-    expect(s.templates.pageClaim("x")).toEqual({ type: "noul", instructions: "x" });
+    expect(s.templates.claim("x")).toEqual({ type: "noul", instructions: "x" });
     expect(s.templates.urlClaim).toBe(defaultTemplates.urlClaim);
   });
 });

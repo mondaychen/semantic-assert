@@ -54,7 +54,7 @@ export TYPESAFE_API_KEY="your-api-key"
 Save this as `check.mjs`:
 
 ```js
-import { Judge, noul, resolveJudgeSettings } from "semantic-assert";
+import { Judge, resolveJudgeSettings } from "semantic-assert";
 import { typesafe } from "semantic-assert-typesafe";
 
 const judge = new Judge({
@@ -66,21 +66,15 @@ const judge = new Judge({
 await judge.expectClaims(
   async () => ({ message: "Your changes have been saved." }),
   [{ claim: "The message confirms success" }],
-  {
-    timeoutMs: 0, // Judge this static response once.
-    template: (claim) =>
-      noul({
-        statement: claim,
-        question: "Is the statement supported by the supplied JSON state?",
-      }),
-  },
+  { timeoutMs: 0 }, // Judge this static response once.
 );
 console.log("Semantic assertion passed.");
 ```
 
 Run `node check.mjs`. If your key is in `.env`, use
-`node --env-file=.env check.mjs` instead. The custom template above describes
-JSON data; the built-in template describes captured web pages.
+`node --env-file=.env check.mjs` instead. The built-in templates describe
+arbitrary JSON; the Playwright adapter swaps in templates that name the fields
+of a captured page.
 
 To use Vercel AI Gateway instead, install its adapter and set your Gateway key:
 
