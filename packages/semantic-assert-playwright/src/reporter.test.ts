@@ -12,6 +12,7 @@ import UsageReporter from "./reporter";
 
 function testCase(feature: string, title: string): TestCase {
   return {
+    id: `${feature}/${title}`,
     title,
     parent: { title: feature },
     location: { file: "/x/f.spec.js" },
@@ -84,5 +85,16 @@ describe("UsageReporter", () => {
       inputTokens: 3_000_000,
       costUsd: 3,
     });
+  });
+
+  it("merges retries of one test into a single row with the final status", () => {
+    const flaky = testCase("F", "flaky");
+    const { written } = runReporter((reporter) => {
+      reporter.onTestEnd(flaky, result("failed", [call]));
+      reporter.onTestEnd(flaky, result("passed", [call, call]));
+    });
+    expect(written.scenarios).toHaveLength(1);
+    expect(written.scenarios[0]).toMatchObject({ scenario: "flaky", status: "passed", calls: 3 });
+    expect(written.totals).toMatchObject({ scenarios: 1, calls: 3, costUsd: 3 });
   });
 });

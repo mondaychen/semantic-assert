@@ -14,6 +14,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { FullConfig, Reporter, TestCase, TestResult } from "@playwright/test/reporter";
 import {
+  type CallMetrics,
   METRICS_ATTACHMENT,
   type ScenarioMetrics,
   type ScenarioUsage,
@@ -47,8 +48,16 @@ function groupTitle(test: TestCase): string {
   return test.parent.title || path.basename(test.location.file);
 }
 
+/** Every attempt of one test: retries spend real tokens, so their calls add up. */
+interface Scenario {
+  group: string;
+  scenario: string;
+  status: string;
+  calls: CallMetrics[];
+}
+
 export default class UsageReporter implements Reporter {
-  private readonly rows: ScenarioUsage[] = [];
+  private readonly scenarios = new Map<string, Scenario>();
   private baseDir = process.cwd();
 
   constructor(private readonly options: UsageReporterOptions = {}) {}
@@ -59,22 +68,38 @@ export default class UsageReporter implements Reporter {
     this.baseDir = config.configFile ? path.dirname(config.configFile) : config.rootDir;
   }
 
+  /** Called once per attempt; retries of one test merge into a single row. */
   onTestEnd(test: TestCase, result: TestResult): void {
     const metrics = parseMetrics(result);
     if (!metrics) return;
-    this.rows.push({
+    const existing = this.scenarios.get(test.id);
+    if (existing) {
+      existing.calls.push(...metrics.calls);
+      existing.status = result.status;
+      return;
+    }
+    this.scenarios.set(test.id, {
       group: groupTitle(test),
       scenario: test.title,
       status: result.status,
-      models: Array.from(new Set(metrics.calls.map((c) => c.model))),
-      ...metrics.totals,
-      // Attachments written by older versions may predate the cost field.
-      costUsd: metrics.totals.costUsd ?? null,
+      calls: metrics.calls,
     });
   }
 
   onEnd(): void {
-    const summary = aggregateUsage(this.rows);
+    const rows: ScenarioUsage[] = Array.from(this.scenarios.values(), (s) => {
+      const { totals } = summarizeCalls(s.calls);
+      return {
+        group: s.group,
+        scenario: s.scenario,
+        status: s.status,
+        models: Array.from(new Set(s.calls.map((c) => c.model))),
+        ...totals,
+        // Attachments written by older versions may predate the cost field.
+        costUsd: totals.costUsd ?? null,
+      };
+    });
+    const summary = aggregateUsage(rows);
     if (this.options.outputFile) {
       const file = path.resolve(this.baseDir, this.options.outputFile);
       fs.mkdirSync(path.dirname(file), { recursive: true });
