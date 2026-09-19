@@ -79,7 +79,7 @@ export class SemanticAssertionError extends Error {
     public readonly results: ClaimResult[],
   ) {
     super(message);
-    this.name = "JevAssertionError";
+    this.name = "SemanticAssertionError";
   }
 }
 

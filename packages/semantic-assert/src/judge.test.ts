@@ -82,6 +82,7 @@ describe("Judge.expectClaims", () => {
         .expectClaims(async () => ({ page: "x" }), [{ claim: "never" }])
         .catch((e: unknown) => e);
       expect(error).toBeInstanceOf(SemanticAssertionError);
+      expect((error as Error).name).toBe("SemanticAssertionError");
       expect((error as Error).message).toMatch(/FAIL {2}p\(yes\)=0\.10 {2}threshold 0\.7/);
       expect(attach).toHaveBeenCalledWith("semantic-state", { page: "x" });
     } finally {
