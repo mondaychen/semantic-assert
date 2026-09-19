@@ -40,14 +40,64 @@ await judge.expectClaims(
 );
 ```
 
-`FakeProvider` returns scripted answers; it does not evaluate language. For real
-judgments, install `semantic-assert-typesafe`, set `TYPESAFE_API_KEY` in your
-server/test environment, and replace the fake provider with `typesafe()`.
-See the [Playwright guide](packages/semantic-assert-playwright/README.md) for UI tests.
+`FakeProvider` returns scripted answers; it does not evaluate language.
 
-For Jev through Vercel AI Gateway, use `aiSdk()` from
-[`semantic-assert-ai-sdk`](packages/semantic-assert-ai-sdk/README.md) and set
-`AI_GATEWAY_API_KEY` in your server/test environment.
+## Try it with an API key
+
+Use Jev through TypeSafe for real judgments. After the first npm release:
+
+```sh
+pnpm add semantic-assert semantic-assert-typesafe
+export TYPESAFE_API_KEY="your-api-key"
+```
+
+Save this as `check.mjs`:
+
+```js
+import { Judge, noul, resolveJudgeSettings } from "semantic-assert";
+import { typesafe } from "semantic-assert-typesafe";
+
+const judge = new Judge({
+  provider: typesafe(),
+  settings: resolveJudgeSettings({ threshold: 0.8 }),
+  hooks: { wait: (ms) => new Promise((resolve) => setTimeout(resolve, ms)) },
+});
+
+await judge.expectClaims(
+  async () => ({ message: "Your changes have been saved." }),
+  [{ claim: "The message confirms success" }],
+  {
+    timeoutMs: 0, // Judge this static response once.
+    template: (claim) =>
+      noul({
+        statement: claim,
+        question: "Is the statement supported by the supplied JSON state?",
+      }),
+  },
+);
+console.log("Semantic assertion passed.");
+```
+
+Run `node check.mjs`. If your key is in `.env`, use
+`node --env-file=.env check.mjs` instead. The custom template above describes
+JSON data; the built-in template describes captured web pages.
+
+To use Vercel AI Gateway instead, install its adapter and set your Gateway key:
+
+```sh
+pnpm add semantic-assert semantic-assert-ai-sdk
+export AI_GATEWAY_API_KEY="your-api-key"
+```
+
+Replace the `typesafe` import with `import { aiSdk } from "semantic-assert-ai-sdk"`
+and use `provider: aiSdk()` in the same example. It defaults to `typesafe-ai/jev`.
+See the [AI SDK provider guide](packages/semantic-assert-ai-sdk/README.md) for options
+and the [Playwright guide](packages/semantic-assert-playwright/README.md) for UI tests.
+
+To try the checked-out repository before publication, follow the
+[runnable examples guide](examples/README.md). With `AI_GATEWAY_API_KEY` in the
+root `.env`, run `pnpm install`, `pnpm exec playwright install chromium`, and
+`pnpm examples:gateway` to exercise both core and browser examples.
 
 Assertions send captured state to the configured provider. Use the Playwright
 adapter's `redact` hook to remove sensitive data. Keep API keys server-side.
