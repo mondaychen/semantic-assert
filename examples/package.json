@@ -5,13 +5,14 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
-    "test": "pnpm build && node --test dist/core/*.test.js",
+    "test": "pnpm build && node --test --test-concurrency=1 dist/core/*.test.js",
     "test:playwright": "playwright test"
   },
   "devDependencies": {
     "@playwright/test": "1.58.1",
     "@types/node": "^22.15.17",
     "semantic-assert": "workspace:*",
+    "semantic-assert-ai-sdk": "workspace:*",
     "semantic-assert-playwright": "workspace:*",
     "semantic-assert-typesafe": "workspace:*",
     "typescript": "5.7.3"

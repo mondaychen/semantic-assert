@@ -29,19 +29,20 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
+      AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
     steps:
       - uses: actions/checkout@v4
-        if: env.TYPESAFE_API_KEY != ''
+        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != ''
       - uses: pnpm/action-setup@v4
-        if: env.TYPESAFE_API_KEY != ''
+        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != ''
       - uses: actions/setup-node@v4
-        if: env.TYPESAFE_API_KEY != ''
+        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != ''
         with:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-        if: env.TYPESAFE_API_KEY != ''
+        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != ''
       - run: pnpm exec playwright install --with-deps chromium
-        if: env.TYPESAFE_API_KEY != ''
+        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != ''
       - run: pnpm test:integration
-        if: env.TYPESAFE_API_KEY != ''
+        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != ''

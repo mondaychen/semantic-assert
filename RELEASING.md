@@ -1,13 +1,13 @@
 # Publishing packages
 
-The repository root is private. Only the three packages under `packages/` are
+The repository root and examples workspace are private. Only the four packages under `packages/` are
 published. Their initial version is `0.1.0`; subsequent releases are tracked
 independently with Changesets.
 
 ## First release
 
 - Confirm the npm names are available to the publishing account. They currently
-  use `semantic-assert`, `semantic-assert-typesafe`, and `semantic-assert-playwright`.
+  use `semantic-assert`, `semantic-assert-typesafe`, `semantic-assert-ai-sdk`, and `semantic-assert-playwright`.
 - Add the actual public repository URL, homepage, and issue tracker to the package
   manifests once the remote exists. No placeholder owner is embedded in this repo.
 - Run `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm check:packages`, and
@@ -27,7 +27,7 @@ the Apache License, Version 2.0.
    and packed consumers before Changesets publishes unpublished package versions.
 
 Use pnpm for manual packing or publishing. It rewrites `workspace:^` dependencies
-to ordinary semver ranges in the tarball. The TypeSafe and Playwright packages
+to ordinary semver ranges in the tarball. The TypeSafe, AI SDK, and Playwright packages
 depend on the separately published core; each tarball contains only its own build,
 README, manifest, and license. `prepack` rebuilds the selected package. Build the
 workspace first if packing an adapter directly from a clean checkout.

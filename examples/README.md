@@ -36,7 +36,7 @@ Fake token counts are sample values, and cost is unknown.
 The shared [JSON judge](support/json-judge.ts) supplies templates that reference
 arbitrary JSON. The library's built-in templates refer to web-page fields such as
 `aria_snapshot`; replace them when judging your own data. The
-[provider helper](support/provider.ts) selects fake or TypeSafe explicitly.
+[provider helper](support/provider.ts) selects fake, TypeSafe, or AI SDK explicitly.
 
 ## Run with TypeSafe
 
@@ -58,6 +58,66 @@ After building, run an individual file from the repository root:
 pnpm --filter semantic-assert-examples exec node --test dist/core/generated-response.test.js
 pnpm --filter semantic-assert-examples test:playwright checkout.spec.ts
 ```
+
+## Run through Vercel AI Gateway
+
+Set `AI_GATEWAY_API_KEY` and select the AI SDK provider. It uses the same Jev
+evaluation model through Vercel's Gateway:
+
+```sh
+EXAMPLE_PROVIDER=ai-sdk pnpm examples:core
+EXAMPLE_PROVIDER=ai-sdk pnpm examples:playwright
+```
+
+If the key is in the repository's `.env`, build once and let Node load that file
+for each runner (these commands run from the repository root):
+
+```sh
+pnpm build
+EXAMPLE_PROVIDER=ai-sdk node --env-file=.env --test --test-concurrency=1 examples/dist/core/*.test.js
+EXAMPLE_PROVIDER=ai-sdk node --env-file=.env node_modules/@playwright/test/cli.js test --config=examples/playwright.config.ts
+```
+
+Live requests require an enabled AI Gateway account and incur provider usage.
+The Gateway provider reports cost only when explicit pricing is configured, so
+the default examples show `n/a`. Choice confidence is the selected option's
+probability; it differs from the direct TypeSafe provider's native confidence.
+The failure-evidence example continues to use a scripted provider.
+
+### Pace requests on the free tier
+
+With the key in `.env`, this command runs both suites sequentially with no
+intentional delay by default:
+
+```sh
+pnpm examples:gateway
+```
+
+If you encounter rate limits on the free tier, opt into a pause before every
+live evaluation, including each polling attempt. Set the delay in milliseconds
+(0–300000; defaults to zero):
+
+```sh
+EXAMPLE_REQUEST_DELAY_MS=60000 pnpm examples:gateway
+```
+
+The runner loads the root `.env`, uses one Node test process at a time and one
+Playwright worker, and runs the core suite before the browser suite. Core failure
+stops the runner before the browser suite; the browser suite stops on its first
+failure. Don't run multiple live suites simultaneously with the same account.
+
+With pacing enabled, the example provider disables SDK retries so a `429` fails
+without a burst of short-backoff requests. Assertion and browser-test timeouts
+grow to accommodate the pauses. Fake examples remain immediate. Reported provider
+wait time includes this intentional pause.
+
+`EXAMPLE_REQUEST_DELAY_MS` also works with the individual example commands for
+either live provider. When invoking Node directly, include `--test-concurrency=1`.
+The published provider packages themselves do not add any delay.
+
+The example delay is a starting point, not a guaranteed limit. Vercel does not
+publish fixed per-model numbers; if a run still gets a `429`, wait for the limit
+to recover or increase the delay. See [Gateway rate limits](https://vercel.com/docs/ai-gateway/rate-limits).
 
 ## Adapt an example
 

@@ -5,11 +5,12 @@ JSON state, answered as typed yes/no probabilities and multiple-choice
 distributions, with polling, thresholds and usage metrics. It knows nothing
 about browsers, test runners or model vendors. Providers and adapters plug in:
 
-| Package                      | Role                                                  |
-| ---------------------------- | ----------------------------------------------------- |
-| `semantic-assert`            | this package: types, `Judge`, settings, metrics       |
-| `semantic-assert-typesafe`   | provider for TypeSafe's Jev (System One)              |
-| `semantic-assert-playwright` | Playwright capture, fixture, matchers, usage reporter |
+| Package                      | Role                                                           |
+| ---------------------------- | -------------------------------------------------------------- |
+| `semantic-assert`            | this package: types, `Judge`, settings, metrics                |
+| `semantic-assert-typesafe`   | provider for TypeSafe's Jev (System One)                       |
+| `semantic-assert-ai-sdk`     | Vercel AI SDK evaluation provider, including Jev on AI Gateway |
+| `semantic-assert-playwright` | Playwright capture, fixture, matchers, usage reporter          |
 
 ## Provider interface
 

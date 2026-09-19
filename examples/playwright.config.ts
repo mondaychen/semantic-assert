@@ -1,8 +1,9 @@
 import { defineConfig } from "@playwright/test";
+import { testTimeoutMs } from "./support/timing.js";
 
 export default defineConfig({
   testDir: "./playwright",
-  timeout: 60_000,
+  timeout: testTimeoutMs,
   workers: 1,
   reporter: [
     ["list"],

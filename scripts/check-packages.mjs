@@ -9,7 +9,12 @@ const root = fileURLToPath(new URL("../", import.meta.url));
 const consumer = mkdtempSync(join(tmpdir(), "semantic-assert-consumer-"));
 const run = (command, args, cwd = consumer) =>
   execFileSync(command, args, { cwd, stdio: "inherit" });
-const names = ["semantic-assert", "semantic-assert-typesafe", "semantic-assert-playwright"];
+const names = [
+  "semantic-assert",
+  "semantic-assert-typesafe",
+  "semantic-assert-playwright",
+  "semantic-assert-ai-sdk",
+];
 const tarballs = [];
 for (const name of names) {
   const cwd = resolve(root, "packages", name);
@@ -70,6 +75,7 @@ const require = createRequire(import.meta.url);
 for (const load of [(name) => import(name), async (name) => require(name)]) {
   const core = await load('semantic-assert');
   const { typesafe } = await load('semantic-assert-typesafe');
+  const { aiSdk } = await load('semantic-assert-ai-sdk');
   const adapter = await load('semantic-assert-playwright');
   const reporter = await load('semantic-assert-playwright/reporter');
   assert.equal(typeof typesafe, 'function');
@@ -87,6 +93,18 @@ for (const load of [(name) => import(name), async (name) => require(name)]) {
   const evaluation = await remote.evaluate('Saved', { claim_0: core.noul('The operation succeeded') });
   assert.equal(evaluation.answers.claim_0.noul, 0.99);
   assert.equal(evaluation.attempts, 1);
+  const gatewayProvider = aiSdk({
+    gateway: {
+      apiKey: 'test',
+      fetch: async () => Response.json({
+        answers: { claim_0: { type: 'boolean', probability: 0.99 } },
+        usage: { inputTokens: 100, outputTokens: 1 },
+      }),
+    },
+  });
+  const gatewayResult = await gatewayProvider.evaluate('Saved', { claim_0: core.noul('The operation succeeded') });
+  assert.equal(gatewayResult.answers.claim_0.noul, 0.99);
+  assert.equal(gatewayResult.attempts, 1);
   assert.equal(typeof adapter.PageJudge, 'function');
   assert.equal(typeof reporter.default, 'function');
   assert.equal(adapter.Judge, core.Judge);
@@ -101,11 +119,14 @@ run("node", ["smoke.mjs"]);
 const types = `
 import { FakeProvider, Judge, resolveJudgeSettings, type Provider } from 'semantic-assert';
 import { typesafe } from 'semantic-assert-typesafe';
+import { aiSdk, type AiSdkProviderOptions } from 'semantic-assert-ai-sdk';
 import { PageJudge, judgeFixtures, createJudgeExpect } from 'semantic-assert-playwright';
 import UsageReporter from 'semantic-assert-playwright/reporter';
 const provider: Provider = typesafe({ apiKey: 'test' });
+const sdkOptions: AiSdkProviderOptions = { model: 'typesafe-ai/jev' };
+const sdkProvider: Provider = aiSdk(sdkOptions);
 new Judge({ provider: new FakeProvider(), settings: resolveJudgeSettings(), hooks: { wait: async () => {} } });
-void [provider, PageJudge, judgeFixtures, createJudgeExpect, UsageReporter];
+void [provider, sdkProvider, PageJudge, judgeFixtures, createJudgeExpect, UsageReporter];
 `;
 for (const extension of ["mts", "cts"]) {
   writeFileSync(join(consumer, `consumer.${extension}`), types);
