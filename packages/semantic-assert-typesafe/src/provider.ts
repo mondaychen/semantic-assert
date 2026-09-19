@@ -3,7 +3,7 @@
 
 import type { JsonValue, Provider, ProviderResult, Questions } from "semantic-assert";
 
-import { type CallMetrics, JevClient, type JevClientOptions } from "./client";
+import { JevClient, type JevClientOptions } from "./client";
 
 /**
  * USD per million input tokens. Jev 1.13 is $0.042/Mtok with free output
@@ -34,8 +34,6 @@ export class TypeSafeProvider implements Provider {
   private readonly clientOptions: Omit<JevClientOptions, "onCall">;
   private readonly usdPerMtokInput: number;
   private clientInstance: JevClient | undefined;
-  /** Attempts of the most recent call, reported by the client after each success. */
-  private lastAttempts: number = 1;
 
   constructor(options: TypeSafeProviderOptions = {}) {
     const { usdPerMtokInput, ...clientOptions } = options;
@@ -48,12 +46,7 @@ export class TypeSafeProvider implements Provider {
    * (e.g. in a Playwright fixtures file) before the API key is validated.
    */
   get client(): JevClient {
-    this.clientInstance ??= new JevClient({
-      ...this.clientOptions,
-      onCall: (metrics: CallMetrics) => {
-        this.lastAttempts = metrics.attempts;
-      },
-    });
+    this.clientInstance ??= new JevClient(this.clientOptions);
     return this.clientInstance;
   }
 
@@ -65,7 +58,7 @@ export class TypeSafeProvider implements Provider {
       usage: { inputTokens: result.usage.input_tokens, outputTokens: result.usage.output_tokens },
       // Jev bills input tokens only.
       costUsd: (result.usage.input_tokens / 1_000_000) * this.usdPerMtokInput,
-      attempts: this.lastAttempts,
+      attempts: result.attempts,
     };
   }
 }

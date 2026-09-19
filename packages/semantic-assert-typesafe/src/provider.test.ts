@@ -4,7 +4,7 @@
 import { noul } from "semantic-assert";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { FetchLike } from "./client";
+import { type FetchLike, JevClient } from "./client";
 import { TypeSafeProvider, typesafe } from "./provider";
 
 describe("TypeSafeProvider", () => {
@@ -40,5 +40,48 @@ describe("TypeSafeProvider", () => {
       costUsd: 0.021,
       attempts: 1,
     });
+  });
+
+  it("reports attempts per call, even when calls overlap", async () => {
+    const ok = (model: string) =>
+      new Response(
+        JSON.stringify({
+          model,
+          answers: { a: { type: "noul", noul: 0.9 } },
+          usage: { input_tokens: 1, output_tokens: 1 },
+        }),
+        { status: 200 },
+      );
+    const fetchMock = vi.fn<FetchLike>().mockImplementation(async (_url, init) => {
+      const { state } = JSON.parse(init.body as string) as { state: string };
+      if (state === "retry" && fetchMock.mock.calls.length === 1) {
+        return new Response(JSON.stringify({ error: "slow down" }), { status: 429 });
+      }
+      return ok(state);
+    });
+    const provider = new TypeSafeProvider({ apiKey: "k", fetch: fetchMock, sleep: async () => {} });
+    const [retried, direct] = await Promise.all([
+      provider.evaluate("retry", { a: noul("q") }),
+      provider.evaluate("direct", { a: noul("q") }),
+    ]);
+    expect(retried.attempts).toBe(2);
+    expect(direct.attempts).toBe(1);
+  });
+
+  it("exposes attempts on the client result", async () => {
+    const fetchMock = vi.fn<FetchLike>().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          model: "m",
+          answers: { a: { type: "noul", noul: 0.5 } },
+          usage: { input_tokens: 1, output_tokens: 1 },
+        }),
+        { status: 200 },
+      ),
+    );
+    const result = await new JevClient({ apiKey: "k", fetch: fetchMock }).systemOne("s", {
+      a: noul("q"),
+    });
+    expect(result.attempts).toBe(1);
   });
 });

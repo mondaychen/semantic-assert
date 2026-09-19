@@ -19,6 +19,8 @@ export interface SystemOneResult<Q extends Questions> {
   model: string;
   answers: AnswersFor<Q>;
   usage: { input_tokens: number; output_tokens: number };
+  /** Requests this call needed; 1 when the first attempt succeeded. */
+  attempts: number;
 }
 
 /** What one `systemOne` call cost, recorded after it settles. */
@@ -153,20 +155,23 @@ export class JevClient {
       }
 
       // A malformed success body is a bug, not a transient failure: no retry.
-      const result = this.parseResult(payload, questions);
+      const result = { ...this.parseResult(payload, questions), attempts: attempt + 1 };
       this.onCall?.({
         model: result.model,
         questionCount: Object.keys(questions).length,
         inputTokens: result.usage.input_tokens,
         outputTokens: result.usage.output_tokens,
         waitMs: performance.now() - startedAt,
-        attempts: attempt + 1,
+        attempts: result.attempts,
       });
       return result;
     }
   }
 
-  private parseResult<Q extends Questions>(payload: unknown, questions: Q): SystemOneResult<Q> {
+  private parseResult<Q extends Questions>(
+    payload: unknown,
+    questions: Q,
+  ): Omit<SystemOneResult<Q>, "attempts"> {
     if (!isRecord(payload) || !isRecord(payload.answers) || typeof payload.model !== "string") {
       throw new Error(
         `Unexpected TypeSafe response shape: ${String(JSON.stringify(payload)).slice(0, 500)}`,
