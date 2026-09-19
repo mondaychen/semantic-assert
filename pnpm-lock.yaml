@@ -27,6 +27,27 @@ importers:
         specifier: 5.7.3
         version: 5.7.3
 
+  examples:
+    devDependencies:
+      '@playwright/test':
+        specifier: 1.58.1
+        version: 1.58.1
+      '@types/node':
+        specifier: ^22.15.17
+        version: 22.20.4
+      semantic-assert:
+        specifier: workspace:*
+        version: link:../packages/semantic-assert
+      semantic-assert-playwright:
+        specifier: workspace:*
+        version: link:../packages/semantic-assert-playwright
+      semantic-assert-typesafe:
+        specifier: workspace:*
+        version: link:../packages/semantic-assert-typesafe
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+
   packages/semantic-assert:
     devDependencies:
       '@types/node':

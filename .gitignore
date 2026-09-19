@@ -9,3 +9,4 @@ playwright-report/
 !.env.example
 *.tgz
 .DS_Store
+.pnpm-store

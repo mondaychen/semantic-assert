@@ -49,6 +49,15 @@ adapter's `redact` hook to remove sensitive data. Keep API keys server-side.
 Model judgments are probabilistic: calibrate thresholds for your provider and
 use ordinary assertions for exact strings, counting, and arithmetic.
 
+## Examples
+
+See the [runnable examples](examples/README.md) for generated-response checks,
+background-job polling, ticket classification, failure evidence, and Playwright
+tests for checkout, error messages, search states, and document highlights.
+Run `pnpm examples:core` or `pnpm examples:playwright` after installing workspace
+dependencies (and Chromium for browser examples). Both default to scripted
+providers with no API key; the guide also shows how to opt into TypeSafe.
+
 ## Development
 
 Use Node.js 22+ and pnpm 10.12.1 (pinned in `packageManager`).

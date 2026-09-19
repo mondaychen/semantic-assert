@@ -17,7 +17,9 @@
     "changeset": "changeset",
     "version:packages": "changeset version",
     "release": "pnpm check && pnpm check:packages && changeset publish",
-    "test:integration": "pnpm build && playwright test"
+    "test:integration": "pnpm build && playwright test",
+    "examples:core": "pnpm build && pnpm --filter semantic-assert-examples test",
+    "examples:playwright": "pnpm build && pnpm --filter semantic-assert-examples test:playwright"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
