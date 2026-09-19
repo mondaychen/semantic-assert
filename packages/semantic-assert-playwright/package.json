@@ -11,6 +11,15 @@
     "testing"
   ],
   "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mondaychen/semantic-assert.git",
+    "directory": "packages/semantic-assert-playwright"
+  },
+  "homepage": "https://github.com/mondaychen/semantic-assert/tree/main/packages/semantic-assert-playwright#readme",
+  "bugs": {
+    "url": "https://github.com/mondaychen/semantic-assert/issues"
+  },
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.ts",
   "license": "Apache-2.0",

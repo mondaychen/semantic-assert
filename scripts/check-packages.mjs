@@ -27,6 +27,8 @@ for (const name of names) {
   );
   assert.equal(packed.private, undefined);
   assert.equal(packed.license, "Apache-2.0");
+  assert.equal(packed.repository?.directory, `packages/${name}`);
+  assert.ok(packed.homepage && packed.bugs?.url, `Missing homepage or bugs URL in ${name}`);
   assert.equal(
     execFileSync("tar", ["-xOf", tarball, "package/LICENSE"], { encoding: "utf8" }),
     readFileSync(join(root, "LICENSE"), "utf8"),
