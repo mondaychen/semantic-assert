@@ -1,7 +1,13 @@
 // Copyright (c) 2026 Normal Computing Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { type Locator, type Page, expect as baseExpect, test } from "@playwright/test";
+import {
+  type ExpectMatcherState,
+  type Locator,
+  type Page,
+  expect as baseExpect,
+  test,
+} from "@playwright/test";
 import {
   type Claim,
   type Provider,
@@ -28,7 +34,8 @@ function isPage(value: Page | Locator): value is Page {
  *   await expect(page).toSatisfy("there is a heading with the text Projects");
  *   await expect(locator).toSatisfyAll(["...", { claim: "...", expected: false }]);
  *
- * Negation via `.not` is not supported; pass `{ expected: false }` claims.
+ * Negation via `.not` is rejected: a claim that does not clear its threshold
+ * is not evidence of the opposite. Pass `{ expected: false }` claims instead.
  */
 export function createJudgeMatchers(config: MatcherConfig) {
   function judgeFor(received: Page | Locator) {
@@ -42,7 +49,17 @@ export function createJudgeMatchers(config: MatcherConfig) {
     };
   }
 
-  async function run(received: Page | Locator, claims: Claim[], options: PageAssertOptions) {
+  async function run(
+    state: ExpectMatcherState,
+    received: Page | Locator,
+    claims: Claim[],
+    options: PageAssertOptions,
+  ) {
+    if (state.isNot) {
+      throw new Error(
+        "Semantic matchers do not support .not: a claim below its threshold does not prove the opposite. Pass { claim, expected: false } instead.",
+      );
+    }
     const { judge, region } = judgeFor(received);
     try {
       const results = await judge.expectPage(claims, { region, ...options });
@@ -57,15 +74,22 @@ export function createJudgeMatchers(config: MatcherConfig) {
   }
 
   return {
-    toSatisfy(received: Page | Locator, claim: string, options: PageAssertOptions = {}) {
-      return run(received, [{ claim }], options);
+    toSatisfy(
+      this: ExpectMatcherState,
+      received: Page | Locator,
+      claim: string,
+      options: PageAssertOptions = {},
+    ) {
+      return run(this, received, [{ claim }], options);
     },
     toSatisfyAll(
+      this: ExpectMatcherState,
       received: Page | Locator,
       claims: Array<string | Claim>,
       options: PageAssertOptions = {},
     ) {
       return run(
+        this,
         received,
         claims.map((c) => (typeof c === "string" ? { claim: c } : c)),
         options,

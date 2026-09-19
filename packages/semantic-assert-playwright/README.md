@@ -102,6 +102,10 @@ await expect(page.getByTestId("agent-panel")).toSatisfyAll([
 ]);
 ```
 
+`.not` is rejected with an error: a claim that misses its threshold is not
+evidence of the opposite. Use `{ claim, expected: false }`, which asks the
+model for the negative directly.
+
 ## Reporter
 
 ```ts
