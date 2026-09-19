@@ -73,7 +73,11 @@ export const defaultTemplates: JudgeTemplates = {
 export interface JudgeSettings {
   /** Pass probability for a positive claim; negated claims need `1 - threshold`. */
   threshold: number;
-  /** How long an assertion keeps re-capturing state while a claim fails. */
+  /**
+   * How long an assertion keeps re-capturing state while a claim fails. It
+   * bounds polling, not a single provider request: a call already in flight
+   * runs to completion under the provider's own timeout and retry settings.
+   */
   timeoutMs: number;
   /** Pause between polls. Each poll is one model request. */
   pollIntervalMs: number;

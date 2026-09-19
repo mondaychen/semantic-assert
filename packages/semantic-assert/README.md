@@ -54,6 +54,12 @@ elapses. `classify` polls until the chosen option is one the caller lists as
 settled. `evaluate` asks arbitrary questions once. Every judgment is handed to
 the optional `attach` hook for the test report.
 
+`timeoutMs` bounds polling, not a single provider request. A request already
+in flight finishes under the provider's own timeout and retry settings, so
+the worst case is one provider call past the deadline. Configure those on
+the provider (`timeoutMs` and `maxRetries` on both bundled providers) and
+keep your test runner's timeout above the sum.
+
 ## Settings
 
 `resolveJudgeSettings(overrides)`: explicit overrides, then

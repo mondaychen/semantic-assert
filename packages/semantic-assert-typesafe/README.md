@@ -27,7 +27,9 @@ validation, `baseUrl`, `model`, `timeoutMs`, `maxRetries`, and injectable `fetch
 and `sleep` functions. The exported `JevClient` remains a compatibility facade.
 
 The facade owns retries (three by default) for HTTP 429/529, connection failures,
-and timeouts, with exponential backoff. SDK retries are disabled to avoid nested
+and timeouts, with exponential backoff. With the default 10 s per-attempt timeout
+that is up to about 47 s for one call, longer than Playwright's default 30 s test
+timeout; lower `timeoutMs` or `maxRetries`, or raise the test timeout, to suit. SDK retries are disabled to avoid nested
 retries and preserve the sleeper hook. HTTP failures remain `JevApiError` values;
 connection and timeout failures use the SDK's error types. Malformed successful
 responses fail immediately. The SDK handles request construction, authentication,
