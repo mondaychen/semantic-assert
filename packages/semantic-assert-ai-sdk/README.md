@@ -77,8 +77,11 @@ errors. No fallback to the direct TypeSafe endpoint occurs.
   `pricing: { inputUsdPerMtok, outputUsdPerMtok }`. Both rates and both token
   counts are required; this is an estimate, not the Gateway invoice.
 
-The AI SDK evaluation API is experimental and can change in patch releases. This
-package pins `ai` to the version exercised by its tests (7.0.107).
+`ai` is a peer dependency (`>=7.0.107 <8`), so one copy is shared with the rest
+of your project and evaluation model instances you pass as `model` come from the
+same package. The AI SDK evaluation API is experimental and can change in patch
+releases; this package is tested against 7.0.107, and if a newer `ai` breaks it,
+pin `ai` to that version in your own project.
 
 ## Examples and checks
 

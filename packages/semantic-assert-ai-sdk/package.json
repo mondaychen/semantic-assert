@@ -28,8 +28,10 @@
   },
   "dependencies": {
     "@types/json-schema": "^7.0.15",
-    "ai": "7.0.107",
     "semantic-assert": "workspace:^"
+  },
+  "peerDependencies": {
+    "ai": ">=7.0.107 <8"
   },
   "devDependencies": {
     "@types/node": "^22.15.17",
@@ -37,7 +39,8 @@
     "oxlint-tsgolint": "^0.17.3",
     "tsup": "^8.5.0",
     "typescript": "5.7.3",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "ai": "7.0.107"
   },
   "module": "./dist/index.js",
   "files": [

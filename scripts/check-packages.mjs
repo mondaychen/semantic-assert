@@ -57,13 +57,15 @@ writeFileSync(
     pnpm: { overrides: { "semantic-assert": `file:${tarballs[0]}` } },
   }),
 );
-const installedVersion = (name) =>
-  JSON.parse(readFileSync(join(root, "node_modules", name, "package.json"), "utf8")).version;
+const installedVersion = (name, from = root) =>
+  JSON.parse(readFileSync(join(from, "node_modules", name, "package.json"), "utf8")).version;
 run("pnpm", [
   "add",
   "--prefer-offline",
   "--ignore-scripts",
   ...tarballs,
+  // Peer of the AI SDK adapter: the consumer must supply it.
+  `ai@${installedVersion("ai", resolve(root, "packages", "semantic-assert-ai-sdk"))}`,
   `@playwright/test@${installedVersion("@playwright/test")}`,
   `typescript@${installedVersion("typescript")}`,
   `@types/node@${installedVersion("@types/node")}`,

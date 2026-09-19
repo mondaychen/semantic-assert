@@ -35,6 +35,9 @@ importers:
       '@types/node':
         specifier: ^22.15.17
         version: 22.20.4
+      ai:
+        specifier: 7.0.107
+        version: 7.0.107(zod@4.6.5)
       semantic-assert:
         specifier: workspace:*
         version: link:../packages/semantic-assert
@@ -77,9 +80,6 @@ importers:
       '@types/json-schema':
         specifier: ^7.0.15
         version: 7.0.15
-      ai:
-        specifier: 7.0.107
-        version: 7.0.107(zod@4.6.5)
       semantic-assert:
         specifier: workspace:^
         version: link:../semantic-assert
@@ -87,6 +87,9 @@ importers:
       '@types/node':
         specifier: ^22.15.17
         version: 22.20.4
+      ai:
+        specifier: 7.0.107
+        version: 7.0.107(zod@4.6.5)
       oxlint:
         specifier: 1.50.0
         version: 1.50.0(oxlint-tsgolint@0.17.4)

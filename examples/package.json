@@ -11,6 +11,7 @@
   "devDependencies": {
     "@playwright/test": "1.58.1",
     "@types/node": "^22.15.17",
+    "ai": "7.0.107",
     "semantic-assert": "workspace:*",
     "semantic-assert-ai-sdk": "workspace:*",
     "semantic-assert-playwright": "workspace:*",
