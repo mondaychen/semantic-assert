@@ -31,7 +31,6 @@ import { FakeProvider, Judge, resolveJudgeSettings } from "semantic-assert";
 const judge = new Judge({
   provider: new FakeProvider({ scripts: [{ claim_0: 0.95 }] }),
   settings: resolveJudgeSettings({ threshold: 0.8 }),
-  hooks: { wait: (ms) => new Promise((resolve) => setTimeout(resolve, ms)) },
 });
 
 await judge.expectClaims(
@@ -60,7 +59,6 @@ import { typesafe } from "semantic-assert-typesafe";
 const judge = new Judge({
   provider: typesafe(),
   settings: resolveJudgeSettings({ threshold: 0.8 }),
-  hooks: { wait: (ms) => new Promise((resolve) => setTimeout(resolve, ms)) },
 });
 
 await judge.expectClaims(

@@ -1,4 +1,3 @@
-import { setTimeout } from "node:timers/promises";
 import { Judge, resolveJudgeSettings, type JudgeHooks, type Provider } from "semantic-assert";
 import { judgeTimeoutMs } from "./timing.js";
 
@@ -11,11 +10,6 @@ export function jsonJudge(provider: Provider, attach?: JudgeHooks["attach"]): Ju
       pollIntervalMs: 25,
       // The built-in templates already describe arbitrary JSON state.
     }),
-    hooks: {
-      wait: async (ms) => {
-        await setTimeout(ms);
-      },
-      attach,
-    },
+    hooks: { attach },
   });
 }

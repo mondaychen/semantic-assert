@@ -32,10 +32,14 @@ export class NotReadyError extends Error {
 export type Capture = () => Promise<JsonValue>;
 
 export interface JudgeHooks {
-  /** Pause between polls, e.g. Playwright's page.waitForTimeout. */
-  wait: (ms: number) => Promise<void>;
+  /** Pause between polls, e.g. Playwright's page.waitForTimeout. Defaults to a timer. */
+  wait?: (ms: number) => Promise<void>;
   /** Receive evidence (answers, judged state) for the test report. */
   attach?: (name: string, body: unknown) => Promise<void>;
+}
+
+function defaultWait(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export interface Claim {
@@ -104,19 +108,21 @@ export function formatClaimResults(results: readonly ClaimResult[]): string {
 export interface JudgeOptions {
   provider: Provider;
   settings: JudgeSettings;
-  hooks: JudgeHooks;
+  hooks?: JudgeHooks;
 }
 
 export class Judge {
   readonly provider: Provider;
   readonly settings: JudgeSettings;
-  private readonly hooks: JudgeHooks;
+  private readonly wait: (ms: number) => Promise<void>;
+  private readonly attachHook: JudgeHooks["attach"];
   private readonly calls: CallMetrics[] = [];
 
   constructor(options: JudgeOptions) {
     this.provider = options.provider;
     this.settings = options.settings;
-    this.hooks = options.hooks;
+    this.wait = options.hooks?.wait ?? defaultWait;
+    this.attachHook = options.hooks?.attach;
   }
 
   /** Usage so far. */
@@ -165,7 +171,7 @@ export class Judge {
   }
 
   private async attach(name: string, body: unknown): Promise<void> {
-    await this.hooks.attach?.(name, body);
+    await this.attachHook?.(name, body);
   }
 
   /**
@@ -198,7 +204,7 @@ export class Judge {
     for (;;) {
       const state = await this.captureOrWait(capture, deadline, pollIntervalMs);
       if (state === null) {
-        await this.hooks.wait(pollIntervalMs);
+        await this.wait(pollIntervalMs);
         continue;
       }
       polls += 1;
@@ -225,7 +231,7 @@ export class Judge {
           lastResults,
         );
       }
-      await this.hooks.wait(pollIntervalMs);
+      await this.wait(pollIntervalMs);
     }
   }
 
@@ -250,7 +256,7 @@ export class Judge {
     for (;;) {
       const state = await this.captureOrWait(capture, deadline, pollIntervalMs);
       if (state === null) {
-        await this.hooks.wait(pollIntervalMs);
+        await this.wait(pollIntervalMs);
         continue;
       }
       polls += 1;
@@ -268,7 +274,7 @@ export class Judge {
         });
         return answer;
       }
-      await this.hooks.wait(pollIntervalMs);
+      await this.wait(pollIntervalMs);
     }
   }
 

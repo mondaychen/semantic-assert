@@ -11,7 +11,6 @@ import { aiSdk } from "semantic-assert-ai-sdk";
 const judge = new Judge({
   provider: aiSdk(),
   settings: resolveJudgeSettings(),
-  hooks: { wait: (ms) => new Promise((resolve) => setTimeout(resolve, ms)) },
 });
 
 const { answers } = await judge.evaluate(

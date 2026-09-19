@@ -174,6 +174,25 @@ describe("Judge.classify", () => {
   });
 });
 
+describe("Judge hooks", () => {
+  it("waits with a timer when no wait hook is given", async () => {
+    vi.useFakeTimers();
+    try {
+      const provider = new FakeProvider({ scripts: [{ claim_0: 0.1 }, { claim_0: 0.9 }] });
+      const judge = new Judge({
+        provider,
+        settings: resolveJudgeSettings({ timeoutMs: 5000, pollIntervalMs: 1000 }),
+      });
+      const pending = judge.expectClaims(async () => "s", [{ claim: "c" }]);
+      await vi.advanceTimersByTimeAsync(1000);
+      await expect(pending).resolves.toHaveLength(1);
+      expect(provider.requests).toHaveLength(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
 describe("Judge.metrics", () => {
   it("accumulates usage and provider-reported cost across calls", async () => {
     const provider = new FakeProvider({ scripts: [{ claim_0: 0.9 }], costUsd: 0.001 });

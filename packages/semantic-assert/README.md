@@ -36,7 +36,7 @@ import { typesafe } from "semantic-assert-typesafe";
 const judge = new Judge({
   provider: typesafe(),
   settings: resolveJudgeSettings({ threshold: 0.8 }),
-  hooks: { wait: (ms) => new Promise((r) => setTimeout(r, ms)) },
+  // hooks are optional: `wait` defaults to a timer, `attach` receives evidence.
 });
 
 // `capture` may throw NotReadyError to ask for another poll.

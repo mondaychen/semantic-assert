@@ -111,7 +111,7 @@ for (const load of [(name) => import(name), async (name) => require(name)]) {
   assert.equal(typeof reporter.default, 'function');
   assert.equal(adapter.Judge, core.Judge);
   const provider = new core.FakeProvider({ scripts: [{ claim_0: 0.99 }] });
-  const judge = new core.Judge({ provider, settings: core.resolveJudgeSettings(), hooks: { wait: async () => {} } });
+  const judge = new core.Judge({ provider, settings: core.resolveJudgeSettings() });
   const [result] = await judge.expectClaims(async () => ({ message: 'Saved' }), [{ claim: 'The operation succeeded' }]);
   assert.equal(result.passed, true);
 }
@@ -127,7 +127,7 @@ import UsageReporter from 'semantic-assert-playwright/reporter';
 const provider: Provider = typesafe({ apiKey: 'test' });
 const sdkOptions: AiSdkProviderOptions = { model: 'typesafe-ai/jev' };
 const sdkProvider: Provider = aiSdk(sdkOptions);
-new Judge({ provider: new FakeProvider(), settings: resolveJudgeSettings(), hooks: { wait: async () => {} } });
+new Judge({ provider: new FakeProvider(), settings: resolveJudgeSettings() });
 void [provider, sdkProvider, PageJudge, judgeFixtures, createJudgeExpect, UsageReporter];
 `;
 for (const extension of ["mts", "cts"]) {
