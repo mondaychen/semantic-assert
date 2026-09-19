@@ -19,8 +19,6 @@ adapter requires `@playwright/test >=1.50.0` as a peer dependency.
 
 ## Try it without an API key
 
-After the first npm release:
-
 ```sh
 pnpm add semantic-assert
 ```
@@ -43,7 +41,7 @@ await judge.expectClaims(
 
 ## Try it with an API key
 
-Use Jev through TypeSafe for real judgments. After the first npm release:
+Use Jev through TypeSafe for real judgments:
 
 ```sh
 pnpm add semantic-assert semantic-assert-typesafe
@@ -86,7 +84,7 @@ and use `provider: aiSdk()` in the same example. It defaults to `typesafe-ai/jev
 See the [AI SDK provider guide](packages/semantic-assert-ai-sdk/README.md) for options
 and the [Playwright guide](packages/semantic-assert-playwright/README.md) for UI tests.
 
-To try the checked-out repository before publication, follow the
+To try the examples from a checkout of this repository, follow the
 [runnable examples guide](examples/README.md). Copy `.env.example` to `.env`,
 fill in `AI_GATEWAY_API_KEY`, then run `pnpm install`, `pnpm exec playwright install chromium`, and
 `pnpm examples:gateway --smoke` to try five core and browser tests using at most

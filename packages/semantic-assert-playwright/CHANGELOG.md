@@ -23,3 +23,7 @@
 - Updated dependencies [c5aa695]
 - Updated dependencies [f703a72]
   - semantic-assert@0.2.0
+
+## 0.1.0
+
+Initial release.

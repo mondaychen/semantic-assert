@@ -15,3 +15,7 @@
 - 0752411: `describeUrl` reports a repeated query key as a list of its values instead of keeping only the last one.
 - aafeef5: `SemanticAssertionError` now reports its own class name in `error.name` instead of the pre-extraction `JevAssertionError`.
 - c5aa695: `resolveJudgeSettings` no longer throws on runtimes without a `process` global; it falls back to the built-in defaults there, as the README already promised.
+
+## 0.1.0
+
+Initial release.

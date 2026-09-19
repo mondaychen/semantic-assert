@@ -1,20 +1,13 @@
 # Publishing packages
 
-The repository root and examples workspace are private. Only the four packages under `packages/` are
-published. The first published version is `0.2.0`; subsequent releases are
-tracked independently with Changesets.
+The repository root and examples workspace are private. Only the four packages
+under `packages/` are published: `semantic-assert`, `semantic-assert-typesafe`,
+`semantic-assert-ai-sdk`, and `semantic-assert-playwright`. Version `0.1.0` of
+each was published on 2026-09-19; releases since are tracked independently with
+Changesets. The source is licensed under the Apache License, Version 2.0.
 
-## First release
-
-- Confirm the npm names are available to the publishing account. They currently
-  use `semantic-assert`, `semantic-assert-typesafe`, `semantic-assert-ai-sdk`, and `semantic-assert-playwright`.
-- Add the actual public repository URL, homepage, and issue tracker to the package
-  manifests once the remote exists. No placeholder owner is embedded in this repo.
-- Run `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm check:packages`, and
-  the browser smoke test described in the README.
-- Authenticate to npm and run `pnpm release` when ready to publish.
-
-The source is licensed under the Apache License, Version 2.0.
+Before any release, run `pnpm install --frozen-lockfile`, `pnpm check`,
+`pnpm check:packages`, and the browser smoke test described in the README.
 
 ## Subsequent releases
 
