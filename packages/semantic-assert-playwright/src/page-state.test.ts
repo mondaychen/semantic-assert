@@ -11,6 +11,7 @@ function fakePage(snapshot: string, regionCount = 1): Page {
   const locator = {
     count: async () => regionCount,
     ariaSnapshot: async () => snapshot,
+    getByRole: () => ({ evaluateAll: async () => [{ name: "Home", href: "/" }] }),
     evaluate: async (_fn: unknown, options: unknown) => [
       {
         text: "cited",
@@ -23,7 +24,10 @@ function fakePage(snapshot: string, regionCount = 1): Page {
     url: () => "https://x.test/p",
     title: async () => "T",
     locator: () => locator,
-    getByRole: () => ({ evaluateAll: async () => [{ name: "Home", href: "/" }] }),
+    // Links are read from the region, never from the whole page.
+    getByRole: () => {
+      throw new Error("page-wide link lookup");
+    },
   } as unknown as Page;
 }
 
@@ -41,9 +45,10 @@ describe("capturePageState", () => {
     });
   });
 
-  it("flags truncation and can include links", async () => {
+  it("flags truncation and can include the region's links", async () => {
     const state = await capturePageState(fakePage("a".repeat(50)), {
       maxChars: 10,
+      region: "main",
       includeLinks: true,
     });
     expect(state.truncated).toBe(true);

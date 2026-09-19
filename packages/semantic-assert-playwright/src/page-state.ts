@@ -30,7 +30,7 @@ export interface CapturePageStateOptions {
    * polling assertions retry.
    */
   region?: Locator | string;
-  /** Also collect link accessible names and hrefs; aria snapshots omit hrefs. */
+  /** Also collect the region's link accessible names and hrefs; aria snapshots omit hrefs. */
   includeLinks?: boolean;
   /**
    * Also report how text elements in the region look (highlighted background,
@@ -93,7 +93,7 @@ export async function capturePageState(
   if (truncated) state.truncated = true;
 
   if (includeLinks) {
-    state.links = await page.getByRole("link").evaluateAll((elements) =>
+    state.links = await target.getByRole("link").evaluateAll((elements) =>
       elements.map((element) => ({
         name: (
           element.getAttribute("aria-label") ??
