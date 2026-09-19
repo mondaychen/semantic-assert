@@ -3,6 +3,14 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Playwright adapter for semantic-assert: page capture via aria snapshots, a scenario fixture, expect matchers, and a usage reporter.",
+  "keywords": [
+    "semantic-assert",
+    "playwright",
+    "matchers",
+    "reporter",
+    "testing"
+  ],
+  "sideEffects": false,
   "main": "./dist/index.cjs",
   "types": "./dist/index.d.ts",
   "license": "Apache-2.0",
