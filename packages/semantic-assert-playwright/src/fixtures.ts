@@ -23,7 +23,7 @@ export interface JudgeFixtureOptions {
 }
 
 export interface JudgeFixtures {
-  /** Scenario-scoped judge: page judgments plus cross-step memory. */
+  /** Scenario-scoped judge: page judgments with evidence attached to the report. */
   judge: PageJudge;
 }
 

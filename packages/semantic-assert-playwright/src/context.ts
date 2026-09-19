@@ -37,8 +37,6 @@ export type PageJudgeOptions = JudgeSettingsOverrides;
 export class PageJudge {
   readonly judge: Judge;
   readonly settings: JudgeSettings;
-  /** Facts a step records for a later step in the same scenario. */
-  readonly memory = new Map<string, string>();
 
   constructor(
     private readonly page: Page,
