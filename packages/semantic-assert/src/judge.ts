@@ -130,13 +130,27 @@ export class Judge {
     return summarizeCalls(this.calls);
   }
 
-  /** Ask the provider and record what the call cost. */
+  /** Ask the provider and record what the call cost, even when it fails. */
   private async ask<Q extends Questions>(
     state: JsonValue,
     questions: Q,
   ): Promise<ProviderResult<Q>> {
     const startedAt = performance.now();
-    const result = await this.provider.evaluate(state, questions);
+    let result: ProviderResult<Q>;
+    try {
+      result = await this.provider.evaluate(state, questions);
+    } catch (error) {
+      this.calls.push({
+        model: "unknown",
+        questionCount: Object.keys(questions).length,
+        inputTokens: 0,
+        outputTokens: 0,
+        waitMs: performance.now() - startedAt,
+        attempts: 1,
+        failed: true,
+      });
+      throw error;
+    }
     this.calls.push({
       model: result.model,
       questionCount: Object.keys(questions).length,

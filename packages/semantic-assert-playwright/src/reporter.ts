@@ -93,7 +93,7 @@ export default class UsageReporter implements Reporter {
         group: s.group,
         scenario: s.scenario,
         status: s.status,
-        models: Array.from(new Set(s.calls.map((c) => c.model))),
+        models: Array.from(new Set(s.calls.filter((c) => !c.failed).map((c) => c.model))),
         ...totals,
         // Attachments written by older versions may predate the cost field.
         costUsd: totals.costUsd ?? null,

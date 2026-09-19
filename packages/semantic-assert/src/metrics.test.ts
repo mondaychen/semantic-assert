@@ -24,6 +24,7 @@ describe("metrics", () => {
     ]);
     expect(s.totals).toEqual({
       calls: 2,
+      failedCalls: 0,
       questions: 3,
       inputTokens: 150,
       outputTokens: 10,
@@ -45,6 +46,7 @@ describe("metrics", () => {
       status: "passed",
       models: ["m"],
       calls: 1,
+      failedCalls: 0,
       questions: 1,
       inputTokens,
       outputTokens: 0,
@@ -68,6 +70,16 @@ describe("metrics", () => {
     expect(text).toContain("Total");
     expect(text).toContain("$0.063000");
     expect(text).toContain("n/a");
+  });
+
+  it("counts failed calls and marks them per scenario", () => {
+    const s = summarizeCalls([call(), call({ model: "unknown", failed: true, inputTokens: 0 })]);
+    expect(s.totals).toMatchObject({ calls: 2, failedCalls: 1 });
+    const text = renderUsage(
+      aggregateUsage([{ group: "A", scenario: "a", status: "failed", models: ["m"], ...s.totals }]),
+    );
+    expect(text).toContain("Failed");
+    expect(text).toContain("2 call(s) (1 failed)");
   });
 
   it("renders a note when nothing was judged", () => {

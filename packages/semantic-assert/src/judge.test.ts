@@ -194,6 +194,21 @@ describe("Judge hooks", () => {
 });
 
 describe("Judge.metrics", () => {
+  it("records a failed provider call and rethrows", async () => {
+    const provider = {
+      name: "broken",
+      evaluate: async () => {
+        throw new Error("HTTP 500");
+      },
+    };
+    const judge = new Judge({ provider, settings: resolveJudgeSettings() });
+    await expect(judge.evaluate("s", { q: { type: "noul", instructions: "x" } })).rejects.toThrow(
+      "HTTP 500",
+    );
+    expect(judge.metrics.totals).toMatchObject({ calls: 1, failedCalls: 1, inputTokens: 0 });
+    expect(judge.metrics.calls[0]).toMatchObject({ model: "unknown", failed: true });
+  });
+
   it("accumulates usage and provider-reported cost across calls", async () => {
     const provider = new FakeProvider({ scripts: [{ claim_0: 0.9 }], costUsd: 0.001 });
     const judge = new Judge({

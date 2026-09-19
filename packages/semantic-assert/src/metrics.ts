@@ -14,6 +14,8 @@ export interface CallMetrics {
   attempts: number;
   /** Cost estimated by the provider from configured rates; undefined when unknown. */
   costUsd?: number;
+  /** Set when the provider threw. Tokens are unknown, so they read as 0; `model` is "unknown". */
+  failed?: true;
 }
 
 /** Per-scenario usage: the calls and their totals. */
@@ -23,7 +25,10 @@ export interface ScenarioMetrics {
 }
 
 export interface UsageTotals {
+  /** Every provider call, including failed ones. */
   calls: number;
+  /** Calls where the provider threw after its own retries. */
+  failedCalls: number;
   questions: number;
   inputTokens: number;
   outputTokens: number;
@@ -46,6 +51,7 @@ export function summarizeCalls(calls: readonly CallMetrics[]): ScenarioMetrics {
     calls: [...calls],
     totals: {
       calls: calls.length,
+      failedCalls: calls.filter((c) => c.failed).length,
       questions: calls.reduce((s, c) => s + c.questionCount, 0),
       inputTokens: calls.reduce((s, c) => s + c.inputTokens, 0),
       outputTokens: calls.reduce((s, c) => s + c.outputTokens, 0),
@@ -80,6 +86,7 @@ function emptyBucket(): UsageBucket {
   return {
     scenarios: 0,
     calls: 0,
+    failedCalls: 0,
     questions: 0,
     inputTokens: 0,
     outputTokens: 0,
@@ -92,6 +99,7 @@ function emptyBucket(): UsageBucket {
 function add(target: UsageBucket, row: UsageTotals): void {
   target.scenarios += 1;
   target.calls += row.calls;
+  target.failedCalls += row.failedCalls;
   target.questions += row.questions;
   target.inputTokens += row.inputTokens;
   target.outputTokens += row.outputTokens;
@@ -147,6 +155,7 @@ export function renderUsage(summary: UsageSummary, groupLabel = "Group"): string
     label,
     String(b.scenarios),
     String(b.calls),
+    String(b.failedCalls),
     String(b.questions),
     b.inputTokens.toLocaleString("en-US"),
     b.outputTokens.toLocaleString("en-US"),
@@ -159,6 +168,7 @@ export function renderUsage(summary: UsageSummary, groupLabel = "Group"): string
       groupLabel,
       "Scenarios",
       "Calls",
+      "Failed",
       "Questions",
       "Input tok",
       "Output tok",
@@ -173,7 +183,7 @@ export function renderUsage(summary: UsageSummary, groupLabel = "Group"): string
   const perScenario = summary.scenarios
     .map(
       (s) =>
-        `  ${s.status.padEnd(8)} ${s.group} › ${s.scenario}: ${s.calls} call(s), ${s.inputTokens.toLocaleString("en-US")} input tok, ${formatUsd(s.costUsd)}, ${formatMs(s.waitMs)} waiting`,
+        `  ${s.status.padEnd(8)} ${s.group} › ${s.scenario}: ${s.calls} call(s)${s.failedCalls ? ` (${s.failedCalls} failed)` : ""}, ${s.inputTokens.toLocaleString("en-US")} input tok, ${formatUsd(s.costUsd)}, ${formatMs(s.waitMs)} waiting`,
     )
     .join("\n");
   return [
