@@ -138,6 +138,21 @@ describe("Judge.classify", () => {
     );
   });
 
+  it("uses a per-call classification template when given", async () => {
+    const { judge, provider } = makeJudge([{ classification: { choice: "a" } }]);
+    await judge.classify(
+      async () => "s",
+      "which?",
+      { a: "A", b: "B" },
+      { template: (q, criteria) => ({ type: "choice", instructions: { custom: q }, criteria }) },
+    );
+    expect(provider.requests[0]!.questions.classification).toEqual({
+      type: "choice",
+      instructions: { custom: "which?" },
+      criteria: { a: "A", b: "B" },
+    });
+  });
+
   it("returns the last answer with its state when it never settles", async () => {
     vi.useFakeTimers();
     try {

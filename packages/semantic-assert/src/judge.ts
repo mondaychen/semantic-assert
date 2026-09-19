@@ -8,7 +8,12 @@
  */
 
 import { type CallMetrics, type ScenarioMetrics, summarizeCalls } from "./metrics";
-import { type ClaimTemplate, type JudgeSettings, assertValidThreshold } from "./settings";
+import {
+  type ClaimTemplate,
+  type ClassificationTemplate,
+  type JudgeSettings,
+  assertValidThreshold,
+} from "./settings";
 import type { ChoiceAnswer, JsonValue, Provider, ProviderResult, Questions } from "./types";
 
 /**
@@ -71,6 +76,8 @@ export interface ClassifyOptions<Option extends string> extends TimingOptions {
    * error keeps polling instead of failing early.
    */
   settled?: readonly NoInfer<Option>[];
+  /** Question wording; defaults to the settings' `classification` template. */
+  template?: ClassificationTemplate;
 }
 
 export class SemanticAssertionError extends Error {
@@ -235,7 +242,8 @@ export class Judge {
   ): Promise<ChoiceAnswer<Option>> {
     const { timeoutMs, pollIntervalMs } = this.timing(options);
     const settled = options.settled === undefined ? null : new Set<Option>(options.settled);
-    const question = this.settings.templates.classification(instructions, criteria);
+    const template = options.template ?? this.settings.templates.classification;
+    const question = template(instructions, criteria);
 
     const deadline = Date.now() + timeoutMs;
     let polls = 0;
