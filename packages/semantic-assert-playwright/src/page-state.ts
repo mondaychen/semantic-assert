@@ -78,8 +78,15 @@ export async function capturePageState(
   const target = typeof region === "string" ? page.locator(region) : region;
   const regionLabel = typeof region === "string" ? region : String(region);
 
-  if (region !== "body" && (await target.count()) === 0) {
-    throw new RegionNotFoundError(regionLabel, page.url());
+  if (region !== "body") {
+    const matches = await target.count();
+    if (matches === 0) throw new RegionNotFoundError(regionLabel, page.url());
+    if (matches > 1) {
+      // Not a NotReadyError: more matches will not resolve by polling.
+      throw new Error(
+        `Region "${regionLabel}" matches ${matches} elements on ${page.url()}. Narrow the selector to one element, e.g. with .first() or a role and name.`,
+      );
+    }
   }
   const snapshot = await target.ariaSnapshot({ timeout: 5_000 });
   const { text, truncated } = truncateText(snapshot, maxChars);

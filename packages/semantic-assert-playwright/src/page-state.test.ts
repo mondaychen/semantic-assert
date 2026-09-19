@@ -4,6 +4,7 @@
 import type { Page } from "@playwright/test";
 import { describe, expect, it } from "vitest";
 
+import { NotReadyError } from "semantic-assert";
 import { RegionNotFoundError, capturePageState } from "./page-state";
 
 /** Just enough of a Playwright Page for capturePageState. */
@@ -59,6 +60,15 @@ describe("capturePageState", () => {
     await expect(
       capturePageState(fakePage("", 0), { maxChars: 10, region: "main" }),
     ).rejects.toBeInstanceOf(RegionNotFoundError);
+  });
+
+  it("rejects an ambiguous region with a plain error, not a retry", async () => {
+    const error = await capturePageState(fakePage("", 2), { maxChars: 10, region: "p" }).catch(
+      (e: unknown) => e,
+    );
+    expect(error).toBeInstanceOf(Error);
+    expect(error).not.toBeInstanceOf(NotReadyError);
+    expect((error as Error).message).toMatch(/matches 2 elements/);
   });
 
   it("applies the redaction hook last", async () => {
