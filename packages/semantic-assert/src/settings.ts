@@ -96,8 +96,13 @@ const BUILT_IN: Omit<JudgeSettings, "templates"> = {
   maxStateChars: 40_000,
 };
 
+/** Environment variable lookup that tolerates runtimes without a `process` global. */
+function readEnv(name: string): string | undefined {
+  return typeof process === "undefined" ? undefined : process.env?.[name];
+}
+
 function readNumberEnv(name: string, fallback: number): number {
-  const raw = process.env[name];
+  const raw = readEnv(name);
   if (raw === undefined || raw.trim() === "") return fallback;
   const value = Number(raw);
   if (!Number.isFinite(value)) throw new Error(`${name} must be a number, got "${raw}"`);

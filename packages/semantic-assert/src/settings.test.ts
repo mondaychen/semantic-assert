@@ -38,6 +38,18 @@ describe("resolveJudgeSettings", () => {
     expect(() => resolveJudgeSettings()).toThrow(/between 0.5 and 1/);
   });
 
+  it("falls back to defaults on runtimes without a process global", () => {
+    process.env.SEMANTIC_ASSERT_THRESHOLD = "0.6";
+    const original = globalThis.process;
+    try {
+      // Simulate an edge runtime: no `process` at all.
+      Reflect.deleteProperty(globalThis, "process");
+      expect(resolveJudgeSettings().threshold).toBe(0.7);
+    } finally {
+      globalThis.process = original;
+    }
+  });
+
   it("merges partial template overrides", () => {
     const s = resolveJudgeSettings({
       templates: { pageClaim: (c) => ({ type: "noul", instructions: c }) },
