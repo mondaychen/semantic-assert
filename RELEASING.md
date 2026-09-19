@@ -14,8 +14,7 @@ independently with Changesets.
   the browser smoke test described in the README.
 - Authenticate to npm and run `pnpm release` when ready to publish.
 
-The source retains its original copyright attribution and is licensed under
-the Apache License, Version 2.0.
+The source is licensed under the Apache License, Version 2.0.
 
 ## Subsequent releases
 
@@ -38,7 +37,3 @@ To inspect one package without publishing:
 pnpm build
 pnpm --filter semantic-assert-playwright pack --pack-destination ../../artifacts
 ```
-
-After publishing, update the original app to use the published versions and remove
-the old internal packages in that app's repository. The extraction here does not
-modify the original app or include its staging fixtures and credentials.
