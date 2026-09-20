@@ -3,6 +3,7 @@ import { test } from "node:test";
 import { choice, noul } from "semantic-assert";
 import { exampleProvider } from "../support/provider.js";
 import { jsonJudge } from "../support/json-judge.js";
+import { judgeTimeoutMs } from "../support/timing.js";
 
 test("route a support ticket using typed questions in one request", async () => {
   const judge = jsonJudge(
@@ -61,7 +62,7 @@ test("wait for a search to reach a usable state", async () => {
       empty: "The search finished without matching articles.",
       error: "The search failed.",
     },
-    { settled: ["results", "empty"] },
+    { settled: ["results", "empty"], timeoutMs: judgeTimeoutMs },
   );
 
   // A timeout returns the last answer, even if it is not settled. Check it.

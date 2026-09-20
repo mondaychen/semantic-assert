@@ -58,7 +58,7 @@ a message that has lost the information the user needs.
 The [runnable test](https://github.com/mondaychen/semantic-assert/blob/main/examples/playwright/alert-copy.spec.ts)
 renders each message as local HTML. It also places recovery advice outside the
 alert to demonstrate why the capture should be scoped. Each fixed page is judged
-once with `timeoutMs: 0`.
+once, using the default zero polling timeout.
 
 ::: tip Check both sides
 These are intended outcomes, not guaranteed model behavior. Try acceptable copy
@@ -93,5 +93,7 @@ assertion failure.
 
 Replace the example's `page.setContent(...)` with `page.goto(...)` and the actions
 that trigger your alert. Keep the role-based locator, visibility check, and claims.
-For an alert that changes while an operation completes, allow polling so each
-attempt captures its current state.
+Wait for the alert with `await expect(alert).toBeVisible()` or
+`await alert.waitFor({ state: "visible" })` before judging it. If its content is
+still changing, wait for the application's ready state or explicitly opt into
+semantic polling with a positive `timeoutMs`.

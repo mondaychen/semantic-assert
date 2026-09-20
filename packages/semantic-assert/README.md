@@ -39,7 +39,7 @@ const judge = new Judge({
   // hooks are optional: `wait` defaults to a timer, `attach` receives evidence.
 });
 
-// `capture` may throw NotReadyError to ask for another poll.
+// Captures and evaluates once by default.
 await judge.expectClaims(
   async () => ({ body: await fetchResponse() }),
   [
@@ -49,10 +49,14 @@ await judge.expectClaims(
 );
 ```
 
-`expectClaims` re-captures and re-asks until every claim passes or the timeout
-elapses. `classify` polls until the chosen option is one the caller lists as
-settled. `evaluate` asks arbitrary questions once. Every judgment is handed to
-the optional `attach` hook for the test report.
+`expectClaims` and `classify` capture and evaluate once by default (`timeoutMs: 0`).
+To opt into polling, set a positive `timeoutMs` per call or in judge settings.
+Then `expectClaims` re-captures until every claim passes or polling times out;
+`classify` polls until the chosen option is listed in `settled` or polling times out.
+`NotReadyError` retries capture only when polling is enabled and time remains.
+`classify` returns its last answer even if it is not settled, so assert the result.
+`evaluate` asks arbitrary questions once. Every judgment is handed to the optional
+`attach` hook for the test report.
 
 `timeoutMs` bounds polling, not a single provider request. A request already
 in flight finishes under the provider's own timeout and retry settings, so
@@ -65,7 +69,7 @@ keep your test runner's timeout above the sum.
 `resolveJudgeSettings(overrides)`: explicit overrides, then
 `SEMANTIC_ASSERT_THRESHOLD`, `SEMANTIC_ASSERT_TIMEOUT_MS`,
 `SEMANTIC_ASSERT_POLL_MS`, `SEMANTIC_ASSERT_MAX_STATE_CHARS`, then defaults of
-0.7, 15 s, 1 s and 40,000 characters. Thresholds must be in [0.5, 1]. The
+0.7, 0 (no polling), 1 s and 40,000 characters. Thresholds must be in [0.5, 1]. The
 question templates that wrap a claim are part of the settings. The defaults
 describe arbitrary JSON state; adapters that capture a known layout (such as
 the Playwright package) supply templates naming its fields, and any template

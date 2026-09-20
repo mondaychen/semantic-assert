@@ -3,6 +3,7 @@ import { test } from "node:test";
 import { NotReadyError } from "semantic-assert";
 import { exampleProvider } from "../support/provider.js";
 import { jsonJudge } from "../support/json-judge.js";
+import { judgeTimeoutMs } from "../support/timing.js";
 
 test("wait for a background export to offer a download", async () => {
   const judge = jsonJudge(
@@ -12,13 +13,20 @@ test("wait for a background export to offer a download", async () => {
   );
   let captures = 0;
 
-  await judge.expectClaims(async () => {
-    // A deterministic stand-in for fetching a changing job status from an API.
-    captures += 1;
-    if (captures === 1) throw new NotReadyError("The export job is not visible yet");
-    if (captures === 2) return { message: "Preparing your export. Please wait.", download: null };
-    return { message: "Your export is ready. Download the CSV.", download: "/exports/report.csv" };
-  }, [{ claim: "The export is ready and the user is offered a download" }]);
+  await judge.expectClaims(
+    async () => {
+      // A deterministic stand-in for fetching a changing job status from an API.
+      captures += 1;
+      if (captures === 1) throw new NotReadyError("The export job is not visible yet");
+      if (captures === 2) return { message: "Preparing your export. Please wait.", download: null };
+      return {
+        message: "Your export is ready. Download the CSV.",
+        download: "/exports/report.csv",
+      };
+    },
+    [{ claim: "The export is ready and the user is offered a download" }],
+    { timeoutMs: judgeTimeoutMs },
+  );
 
   // NotReadyError skips the provider call; later polls capture fresh state.
   assert.ok(captures >= 2);

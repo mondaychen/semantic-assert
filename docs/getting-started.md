@@ -8,6 +8,12 @@ description: Run your first semantic assertion with TypeSafe, AI Gateway, or a s
 Start with a JSON response. The core judge works independently of your test runner.
 For HTML, follow the [Playwright setup](./reference/playwright#install).
 
+::: tip Package release
+These docs describe the repository's current code. The new single-evaluation
+default is queued for the next package release. With already published versions,
+set `timeoutMs: 0` in `resolveJudgeSettings` or on each assertion to disable polling.
+:::
+
 ## Install
 
 Use Node.js 22 or newer.
@@ -33,7 +39,6 @@ const judge = new Judge({
 await judge.expectClaims(
   async () => ({ message: "Your changes have been saved." }),
   [{ claim: "The message confirms success" }],
-  { timeoutMs: 0 },
 );
 
 console.log("Semantic assertion passed.");
@@ -48,8 +53,9 @@ node check.mjs
 If your key is in `.env`, use `node --env-file=.env check.mjs`. The provider does
 not load that file automatically. Keep keys in your test or server environment.
 
-`timeoutMs: 0` judges this fixed message once. Polling an unchanged response would
-add requests without new evidence.
+The judge evaluates once by default (`timeoutMs: 0`). Polling an unchanged response
+would add requests without new evidence. Set a positive timeout only when you
+want to recapture changing state and try again.
 
 ## Use AI Gateway
 
@@ -93,7 +99,6 @@ const judge = new Judge({
 await judge.expectClaims(
   async () => ({ message: "Your changes have been saved." }),
   [{ claim: "The message confirms success" }],
-  { timeoutMs: 0 },
 );
 ```
 

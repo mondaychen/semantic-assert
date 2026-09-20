@@ -84,12 +84,17 @@ variables, then built-in defaults.
 | Setting          | Environment variable              | Default |
 | ---------------- | --------------------------------- | ------- |
 | `threshold`      | `SEMANTIC_ASSERT_THRESHOLD`       | `0.7`   |
-| `timeoutMs`      | `SEMANTIC_ASSERT_TIMEOUT_MS`      | `15000` |
+| `timeoutMs`      | `SEMANTIC_ASSERT_TIMEOUT_MS`      | `0`     |
 | `pollIntervalMs` | `SEMANTIC_ASSERT_POLL_MS`         | `1000`  |
 | `maxStateChars`  | `SEMANTIC_ASSERT_MAX_STATE_CHARS` | `40000` |
 
 Thresholds must be between `0.5` and `1`. Per-claim thresholds override a call's
 threshold, which overrides the judge's setting.
+
+The default zero timeout means one evaluation. A positive `timeoutMs` enables
+polling; `pollIntervalMs` sets the pause between checks. Per-call timing options
+override judge settings. Provider request retries are separate: a single
+evaluation can still retry a transient API failure through `maxRetries`.
 
 The core templates describe arbitrary JSON. The Playwright adapter supplies
 templates naming the captured page fields. Custom templates are supported for

@@ -41,7 +41,7 @@ await judge.expectClaims(
       expected: false,
     },
   ],
-  { threshold: 0.8, timeoutMs: 0 },
+  { threshold: 0.8 },
 );
 ```
 

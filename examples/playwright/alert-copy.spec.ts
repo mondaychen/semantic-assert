@@ -28,7 +28,7 @@ for (const { name, copy, shouldPass } of cases) {
     const provider = exampleProvider({
       scripts: [{ claim_0: shouldPass ? 0.99 : 0.01, claim_1: shouldPass ? 0.98 : 0.02 }],
     });
-    const judge = new PageJudge(page, testInfo, provider, { threshold: 0.8, timeoutMs: 0 });
+    const judge = new PageJudge(page, testInfo, provider, { threshold: 0.8 });
     await page.setContent(`
       <main>
         <aside>Help: if your changes were not saved, try again.</aside>

@@ -57,13 +57,40 @@ test("an alert explains how to recover", async ({ page, judge }) => {
   await expect(alert).toBeVisible();
   await judge.expectPageTo("The alert asks the user to try again", {
     region: alert,
-    timeoutMs: 0,
   });
 });
 ```
 
 Run with `pnpm exec playwright test`. Replace `page.setContent` with navigation and
 interactions for an application test.
+
+## Wait first, then judge once
+
+Semantic assertions evaluate once by default (`timeoutMs: 0`). Let Playwright
+wait for the target before asking the model about its meaning:
+
+```ts
+const alert = page.getByRole("alert");
+await alert.waitFor({ state: "visible" });
+await judge.expectPageTo("The alert explains how to recover", { region: alert });
+```
+
+`await expect(alert).toBeVisible()` also waits and asserts visibility. If the
+element appears before its final content arrives, wait for your application's
+ready state as well.
+
+For content you want the judge to keep checking, opt into polling:
+
+```ts
+await judge.expectPageTo("The export is ready to download", {
+  region: page.getByRole("status"),
+  timeoutMs: 5_000,
+  pollIntervalMs: 1_000,
+});
+```
+
+This recaptures the target between evaluations and stops as soon as the claim
+passes. Provider request timeouts and retries are configured separately.
 
 ## Scope the capture
 

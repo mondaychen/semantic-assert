@@ -179,7 +179,12 @@ export class Judge {
     try {
       return await capture();
     } catch (error) {
-      if (error instanceof NotReadyError && Date.now() + pollIntervalMs <= deadline) return null;
+      if (
+        error instanceof NotReadyError &&
+        Date.now() < deadline &&
+        Date.now() + pollIntervalMs <= deadline
+      )
+        return null;
       throw error;
     }
   }
@@ -190,8 +195,8 @@ export class Judge {
 
   /**
    * Assert claims about captured state. All claims go to the model in one
-   * request. State is re-captured until every claim passes or the timeout
-   * elapses, mirroring auto-retrying UI assertions.
+   * request. Evaluates once by default. With a positive timeout, state is
+   * re-captured until every claim passes or the timeout elapses.
    */
   async expectClaims(
     capture: Capture,
@@ -237,7 +242,7 @@ export class Judge {
         await this.attach("semantic-answers", summary);
         return lastResults;
       }
-      if (Date.now() + pollIntervalMs > deadline) {
+      if (timeoutMs === 0 || Date.now() + pollIntervalMs > deadline) {
         await this.attach("semantic-answers", summary);
         await this.attach("semantic-state", lastState);
         throw new SemanticAssertionError(
@@ -250,9 +255,10 @@ export class Judge {
   }
 
   /**
-   * Pick one option describing the captured state. Re-captures until the
-   * choice is one of `settled` or the timeout elapses. Returns the raw answer
-   * so the acceptance policy stays with the caller.
+   * Pick one option describing the captured state. Evaluates once by default.
+   * With a positive timeout, re-captures until the choice is one of `settled`
+   * or the timeout elapses. Returns the raw answer so the acceptance policy
+   * stays with the caller.
    */
   async classify<Option extends string>(
     capture: Capture,
@@ -277,7 +283,7 @@ export class Judge {
       const { answers, model } = await this.ask(state, { classification: question });
       const answer = answers.classification;
       const isSettled = settled === null || settled.has(answer.choice);
-      if (isSettled || Date.now() + pollIntervalMs > deadline) {
+      if (isSettled || timeoutMs === 0 || Date.now() + pollIntervalMs > deadline) {
         await this.attach("semantic-classification", {
           model,
           polls,

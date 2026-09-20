@@ -10,8 +10,10 @@ Copy changes. Generated replies vary. The behavior you need to verify stays the 
 with a model as the judge and pass/fail thresholds in your code.
 
 ```ts
+const alert = page.getByRole("alert");
+await alert.waitFor({ state: "visible" });
 await judge.expectPageTo("The alert explains how to recover from the error", {
-  region: page.getByRole("alert"),
+  region: alert,
 });
 ```
 
@@ -44,8 +46,9 @@ More before-and-after examples:
 2. **Write claims.** Describe the observable behavior. Related claims share one provider request.
 3. **Assert a result.** The judge compares the returned probabilities with your thresholds.
 
-For changing state, the judge can capture and evaluate again until the claims pass
-or polling times out. For a fixed response, evaluate once with `timeoutMs: 0`.
+Assertions evaluate once by default (`timeoutMs: 0`). Wait for the target with
+Playwright before judging it. For changing state, opt into repeated checks with
+a positive `timeoutMs`, such as `5000`.
 Usage metrics record calls, tokens, and provider wait time.
 
 ## Where semantic assertions fit
@@ -65,5 +68,8 @@ assessment, not proof of correctness.
 
 Follow the [quick start](./getting-started) for a runnable check, then add the
 [Playwright adapter](./reference/playwright) for HTML and browser tests.
+
+The single-evaluation default is queued for the next package release. With
+already published versions, set `timeoutMs: 0` explicitly to get this behavior.
 
 Node.js 22 or newer is supported. Packages ship ESM, CommonJS, and TypeScript declarations.

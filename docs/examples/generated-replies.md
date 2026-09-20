@@ -28,7 +28,6 @@ With a configured [core judge](../getting-started):
 await judge.expectClaims(
   async () => ({ reply }),
   [{ claim: "The reply promises the customer a refund", expected: false }],
-  { timeoutMs: 0 },
 );
 ```
 
@@ -63,7 +62,6 @@ await judge.expectClaims(
     { claim: "The reply gives the customer a concrete next step" },
     { claim: "The reply promises a refund", expected: false, threshold: 0.9 },
   ],
-  { timeoutMs: 0 },
 );
 ```
 

@@ -27,7 +27,7 @@ test.describe("live AI Gateway provider", () => {
     await page.setContent(
       "<main><h1>Projects</h1><p>Your project was saved successfully.</p></main>",
     );
-    const judge = new PageJudge(page, testInfo, aiSdk(), { timeoutMs: 15_000 });
+    const judge = new PageJudge(page, testInfo, aiSdk());
     await judge.expectPage([
       { claim: "The page confirms that the project was saved successfully" },
       { claim: "The page reports that the project could not be saved", expected: false },
@@ -51,7 +51,7 @@ test.describe("live provider", () => {
     await page.setContent(
       "<main><h1>Projects</h1><p>Your project was saved successfully.</p></main>",
     );
-    const judge = new PageJudge(page, testInfo, typesafe(), { timeoutMs: 15_000 });
+    const judge = new PageJudge(page, testInfo, typesafe());
     await judge.expectPageTo("The page confirms that the project was saved successfully");
     await judge.expectPageNotTo("The page reports that the project could not be saved");
     await judge.attachMetrics();

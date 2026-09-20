@@ -25,11 +25,12 @@ test.use({ judgeOptions: { threshold: 0.8 } });
 
 test("dashboard", async ({ page, judge }) => {
   await page.goto("/dashboard");
+  await page.getByRole("heading", { name: "Projects", exact: true }).waitFor({ state: "visible" });
   await judge.expectPageTo("there is a heading with the text Projects");
   const state = await judge.classifyPage(
     "Which option best describes the main content?",
     { listed: "A table with project rows.", empty: "An invitation to create the first project." },
-    { settled: ["listed", "empty"] },
+    { settled: ["listed", "empty"], timeoutMs: 5_000 },
   );
 });
 ```
@@ -61,6 +62,22 @@ block. `judgeProvider` is given where `test` is built, as above. Each call can s
 `threshold`, `timeoutMs`, `pollIntervalMs`, `region` (Locator or selector),
 `includeLinks`, `extraState` and a `redact` hook that runs before anything is
 sent to the API.
+
+## Wait first, then judge once
+
+The default `timeoutMs` is `0`: semantic assertions capture and evaluate once.
+Use Playwright to wait for the target before judging its meaning:
+
+```ts
+const alert = page.getByRole("alert");
+await alert.waitFor({ state: "visible" });
+await judge.expectPageTo("The alert explains how to recover", { region: alert });
+```
+
+Visibility does not guarantee that content has finished updating. Wait for your
+application's ready state as well when needed. To have the judge recapture changing
+content, opt into polling with `{ timeoutMs: 5_000 }` on the assertion or in
+`judgeOptions`. Provider request retries are configured separately.
 
 ## Visual hints
 

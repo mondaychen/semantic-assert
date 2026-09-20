@@ -150,8 +150,11 @@ use the cases to check your provider and threshold against the intended outcomes
 
 Replace local JSON with your service's response, or `page.setContent` with
 `page.goto` and real interactions. Keep capture inside the callback when state
-changes. Use `timeoutMs: 0` for a single judgment of immutable output; retrying an
-unchanged response adds provider calls without providing new evidence.
+changes. Assertions evaluate once by default (`timeoutMs: 0`). For browser tests,
+wait for the target with `locator.waitFor()` or `expect(locator).toBeVisible()`
+before judging it. Only examples that demonstrate changing state opt into polling
+with a positive `timeoutMs`; retrying unchanged content adds provider calls without
+providing new evidence.
 
 `expectClaims` enforces its thresholds. `evaluate` returns answers without an
 acceptance policy. `classify` and `classifyPage` return the last answer on timeout,

@@ -31,15 +31,14 @@ base.describe("createJudgeExpect", () => {
 
   base("fails with the per-claim breakdown when a claim misses", async ({ page }) => {
     await page.setContent(PAGE);
-    const expect = createJudgeExpect({
-      provider: new FakeProvider({ scripts: [{ claim_0: 0.2 }] }),
-      options: { timeoutMs: 0 },
-    });
+    const provider = new FakeProvider({ scripts: [{ claim_0: 0.2 }, { claim_0: 0.99 }] });
+    const expect = createJudgeExpect({ provider });
     const error = await expect(page)
       .toSatisfy("The page shows an error")
       .catch((e: unknown) => e as Error);
     baseExpect(error).toBeInstanceOf(Error);
     baseExpect((error as Error).message).toMatch(/FAIL {2}p\(yes\)=0\.20/);
+    baseExpect(provider.requests).toHaveLength(1);
     baseExpect(base.info().attachments.map((a) => a.name)).toContain("semantic-state");
   });
 
@@ -54,12 +53,13 @@ const test = base.extend<JudgeFixtures & JudgeFixtureOptions>({
   ...judgeFixtures,
   judgeProvider: [new FakeProvider({ scripts: [{ claim_0: 0.85 }] }), { option: true }],
 });
-test.use({ judgeOptions: { threshold: 0.8, timeoutMs: 0 } });
+test.use({ judgeOptions: { threshold: 0.8 } });
 
 test.describe("judge fixture", () => {
   test("provides a PageJudge configured from judgeOptions", async ({ page, judge }) => {
     await page.setContent(PAGE);
     baseExpect(judge.settings.threshold).toBe(0.8);
+    baseExpect(judge.settings.timeoutMs).toBe(0);
     const result = await judge.expectPageTo("There is a heading named Projects");
     baseExpect(result).toMatchObject({ passed: true, probability: 0.85, threshold: 0.8 });
     baseExpect(judge.metrics.totals.calls).toBe(1);

@@ -15,7 +15,7 @@ describe("resolveJudgeSettings", () => {
     const s = resolveJudgeSettings();
     expect(s).toMatchObject({
       threshold: 0.7,
-      timeoutMs: 15_000,
+      timeoutMs: 0,
       pollIntervalMs: 1_000,
       maxStateChars: 40_000,
     });
@@ -30,6 +30,7 @@ describe("resolveJudgeSettings", () => {
       threshold: 0.95,
       timeoutMs: 5000,
     });
+    expect(resolveJudgeSettings({ timeoutMs: 0 }).timeoutMs).toBe(0);
   });
 
   it("rejects thresholds outside [0.5, 1]", () => {

@@ -28,6 +28,7 @@ With the [Playwright judge fixture](../reference/playwright#fixture):
 
 ```ts
 const policy = page.getByRole("article", { name: "Return policy" });
+await policy.waitFor({ state: "visible" });
 
 await judge.expectPage(
   [
@@ -38,7 +39,6 @@ await judge.expectPage(
   {
     region: policy,
     visualHints: { dataAttributes: ["data-highlight-kind"] },
-    timeoutMs: 0,
   },
 );
 ```

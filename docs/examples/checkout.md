@@ -42,8 +42,10 @@ await judge.expectPage(
 ```
 
 These claims test whether the page gives the customer enough information to stop
-trying to pay and wait for shipping updates. The judge can recapture the region
-while the confirmation loads. All three claims share one request per poll.
+trying to pay and wait for shipping updates. Playwright waits for the confirmation
+to be visible and contain the expected order ID, then the judge evaluates once.
+All three claims share one provider request. If the message continues to change,
+wait for the application's ready state or opt into polling with a positive `timeoutMs`.
 
 ## Wording can change; the requirement stays
 

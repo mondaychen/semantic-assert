@@ -36,6 +36,56 @@ function makeTimedJudge(scripts: Script[]) {
 }
 
 describe("Judge.expectClaims", () => {
+  it.each([0, 1000])(
+    "fails after one evaluation by default with a %ims poll interval",
+    async (pollIntervalMs) => {
+      const provider = new FakeProvider({ scripts: [{ claim_0: 0.1 }, { claim_0: 0.9 }] });
+      const capture = vi.fn(async () => "unchanged");
+      const wait = vi.fn(async () => {});
+      const judge = new Judge({
+        provider,
+        settings: resolveJudgeSettings({ pollIntervalMs }),
+        hooks: { wait },
+      });
+
+      await expect(judge.expectClaims(capture, [{ claim: "ready" }])).rejects.toThrow(
+        SemanticAssertionError,
+      );
+      expect(capture).toHaveBeenCalledTimes(1);
+      expect(provider.requests).toHaveLength(1);
+      expect(wait).not.toHaveBeenCalled();
+    },
+  );
+
+  it("allows per-call polling with fresh state when the default is a single evaluation", async () => {
+    const provider = new FakeProvider({ scripts: [{ claim_0: 0.1 }, { claim_0: 0.9 }] });
+    const capture = vi.fn().mockResolvedValueOnce("loading").mockResolvedValueOnce("ready");
+    const wait = vi.fn(async () => {});
+    const judge = new Judge({ provider, settings: resolveJudgeSettings(), hooks: { wait } });
+
+    await judge.expectClaims(capture, [{ claim: "ready" }], { timeoutMs: 5000 });
+    expect(provider.requests.map(({ state }) => state)).toEqual(["loading", "ready"]);
+    expect(wait).toHaveBeenCalledTimes(1);
+  });
+
+  it("surfaces a missing target without retrying or calling the provider by default", async () => {
+    const provider = new FakeProvider();
+    const wait = vi.fn(async () => {});
+    const capture = vi.fn(async () => {
+      throw new NotReadyError("target missing");
+    });
+    const judge = new Judge({
+      provider,
+      settings: resolveJudgeSettings({ pollIntervalMs: 0 }),
+      hooks: { wait },
+    });
+
+    await expect(judge.expectClaims(capture, [{ claim: "ready" }])).rejects.toThrow(NotReadyError);
+    expect(capture).toHaveBeenCalledTimes(1);
+    expect(provider.requests).toHaveLength(0);
+    expect(wait).not.toHaveBeenCalled();
+  });
+
   it("passes when every claim clears its threshold, using per-claim overrides", async () => {
     const { judge, attach } = makeJudge([{ claim_0: 0.96, claim_1: 0.75 }]);
     const results = await judge.expectClaims(
@@ -116,6 +166,33 @@ describe("Judge.expectClaims", () => {
 });
 
 describe("Judge.classify", () => {
+  it.each([0, 1000])(
+    "returns an unsettled answer once by default with a %ims poll interval",
+    async (pollIntervalMs) => {
+      const provider = new FakeProvider({
+        scripts: [
+          { classification: { choice: "loading" } },
+          { classification: { choice: "ready" } },
+        ],
+      });
+      const wait = vi.fn(async () => {});
+      const judge = new Judge({
+        provider,
+        settings: resolveJudgeSettings({ pollIntervalMs }),
+        hooks: { wait },
+      });
+      const answer = await judge.classify(
+        async () => "loading",
+        "state?",
+        { loading: "", ready: "" },
+        { settled: ["ready"] },
+      );
+      expect(answer.choice).toBe("loading");
+      expect(provider.requests).toHaveLength(1);
+      expect(wait).not.toHaveBeenCalled();
+    },
+  );
+
   it("keeps polling while the choice is not settled", async () => {
     const { judge, attach, calls } = makeJudge([
       { classification: { choice: "loading" } },

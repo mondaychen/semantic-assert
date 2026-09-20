@@ -29,8 +29,7 @@ test("a support response explains the next step without inventing a refund", asy
       { claim: "The reply gives the customer a concrete next step" },
       { claim: "The reply promises a refund", expected: false, threshold: 0.9 },
     ],
-    { timeoutMs: 0 },
-  ); // Static output: evaluate once instead of paying to retry it.
+  ); // Static output: the default is a single evaluation.
 
   // All three claims share one captured state and one provider request.
   assert.equal(judge.metrics.totals.calls, 1);

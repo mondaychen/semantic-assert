@@ -74,7 +74,8 @@ export interface JudgeSettings {
   /** Pass probability for a positive claim; negated claims need `1 - threshold`. */
   threshold: number;
   /**
-   * How long an assertion keeps re-capturing state while a claim fails. It
+   * How long an assertion keeps re-capturing state while a claim fails.
+   * Defaults to 0: capture and evaluate once, without polling. It
    * bounds polling, not a single provider request: a call already in flight
    * runs to completion under the provider's own timeout and retry settings.
    */
@@ -100,7 +101,7 @@ export interface JudgeSettingsOverrides {
 
 const BUILT_IN: Omit<JudgeSettings, "templates"> = {
   threshold: 0.7,
-  timeoutMs: 15_000,
+  timeoutMs: 0,
   pollIntervalMs: 1_000,
   maxStateChars: 40_000,
 };

@@ -1,12 +1,11 @@
 import { test } from "@playwright/test";
 import { createJudgeExpect } from "semantic-assert-playwright";
 import { exampleProvider } from "../support/provider.js";
-import { judgeTimeoutMs } from "../support/timing.js";
 
 test("a document highlights the cited passage and marks obsolete guidance", async ({ page }) => {
   const expect = createJudgeExpect({
     provider: exampleProvider({ scripts: [{ claim_0: 0.99, claim_1: 0.98, claim_2: 0.01 }] }),
-    options: { threshold: 0.8, timeoutMs: judgeTimeoutMs },
+    options: { threshold: 0.8 },
   });
   await page.setContent(`
     <article aria-label="Return policy">

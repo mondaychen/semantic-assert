@@ -1,5 +1,6 @@
 import { exampleProvider } from "../support/provider.js";
 import { test, expect } from "./fixtures.js";
+import { judgeTimeoutMs } from "../support/timing.js";
 
 test.use({
   judgeProvider: exampleProvider({
@@ -29,7 +30,7 @@ test("a new project's search reaches an empty state with useful guidance", async
       empty: "No projects match and the page suggests what to do next.",
       error: "The search failed with an error.",
     },
-    { region: "main", settled: ["results", "empty"] },
+    { region: "main", settled: ["results", "empty"], timeoutMs: judgeTimeoutMs },
   );
 
   // classifyPage returns the last answer on timeout; it does not assert success.

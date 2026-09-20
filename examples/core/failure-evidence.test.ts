@@ -13,11 +13,7 @@ test("inspect a failed assertion and its captured evidence", async () => {
   const state = { message: "Something went wrong." };
 
   await assert.rejects(
-    judge.expectClaims(
-      async () => state,
-      [{ claim: "The error message explains how to recover" }],
-      { timeoutMs: 0 },
-    ),
+    judge.expectClaims(async () => state, [{ claim: "The error message explains how to recover" }]),
     (error: unknown) => {
       assert.ok(error instanceof SemanticAssertionError);
       assert.equal(error.results[0]?.passed, false);

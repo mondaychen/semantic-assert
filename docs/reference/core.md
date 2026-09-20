@@ -33,12 +33,12 @@ await judge.expectClaims(
     { claim: "The message explains why the upload failed" },
     { claim: "The message tells the user how to recover" },
   ],
-  { timeoutMs: 0 },
 );
 ```
 
-The call resolves when every claim passes, and throws `SemanticAssertionError`
-when they do not pass before polling ends.
+The default is one evaluation (`timeoutMs: 0`). The call resolves when every claim
+passes, and throws `SemanticAssertionError` otherwise. A positive timeout opts into
+repeated captures and evaluations until all claims pass or polling ends.
 
 ### Negative claims
 
@@ -72,8 +72,9 @@ await judge.expectClaims(
 );
 ```
 
-Throw `NotReadyError` from the callback when the state cannot be captured yet and
-the judge should try again. Use `timeoutMs: 0` for fixed output.
+With polling enabled, throw `NotReadyError` from the callback when the state cannot
+be captured yet and the judge should try again. At the default zero timeout, that
+error is returned immediately without a model call.
 
 `timeoutMs` bounds polling, not an individual provider request. An in-flight
 request can finish after the polling deadline. Set the provider's request timeout
@@ -81,7 +82,8 @@ and retries, and give your test runner enough time for both.
 
 ## Classify state
 
-`classify` chooses among named options. `settled` lists the options that end polling:
+`classify` chooses among named options and evaluates once by default. When you
+also set a positive `timeoutMs`, `settled` lists the options that end polling:
 
 ```ts
 const result = await judge.classify(
@@ -92,11 +94,12 @@ const result = await judge.classify(
     empty: "There are no projects and the user can create one.",
     listed: "Existing projects are listed.",
   },
-  { settled: ["empty", "listed"], timeoutMs: 0 },
+  { settled: ["empty", "listed"] },
 );
 ```
 
-On timeout, `classify` returns the last answer even if its choice is not settled.
+At the default zero timeout, `classify` returns its first answer even if its choice
+is not settled. With polling enabled, it returns the last answer on timeout.
 Assert `result.choice` and any confidence requirement in your own code.
 
 ## Failure evidence and usage
