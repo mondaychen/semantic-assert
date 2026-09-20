@@ -1,6 +1,6 @@
 {
   "name": "semantic-assert-ai-sdk",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "Vercel AI SDK evaluation provider for semantic-assert, with Jev via AI Gateway.",
   "keywords": [

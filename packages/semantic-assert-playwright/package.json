@@ -1,6 +1,6 @@
 {
   "name": "semantic-assert-playwright",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Playwright adapter for semantic-assert: page capture via aria snapshots, a scenario fixture, expect matchers, and a usage reporter.",
   "keywords": [

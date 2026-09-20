@@ -1,6 +1,6 @@
 {
   "name": "semantic-assert",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Provider-agnostic core for semantic assertions: typed yes/no and multiple-choice questions over JSON state, a polling judge with thresholds, and usage metrics. Providers (TypeSafe Jev, LLMs) plug in as separate packages.",
   "keywords": [

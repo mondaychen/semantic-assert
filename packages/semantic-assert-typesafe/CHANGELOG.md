@@ -1,5 +1,12 @@
 # semantic-assert-typesafe
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [597a5bb]
+  - semantic-assert@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes

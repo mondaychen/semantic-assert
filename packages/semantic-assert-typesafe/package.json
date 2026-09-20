@@ -1,6 +1,6 @@
 {
   "name": "semantic-assert-typesafe",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "TypeSafe (Jev) provider for semantic-assert, powered by the official TypeSafe SDK with retries and per-call cost.",
   "keywords": [
