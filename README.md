@@ -4,6 +4,10 @@ Assert plain-English claims about captured state, with a model as the judge.
 Batch claims into one request, retry while state changes, and keep thresholds,
 pass/fail decisions, and usage metrics in code.
 
+**[Documentation](https://mondaychen.github.io/semantic-assert/)** ·
+[Quick start](https://mondaychen.github.io/semantic-assert/getting-started.html) ·
+[HTML and Playwright](https://mondaychen.github.io/semantic-assert/examples/html-alerts.html)
+
 ## Packages
 
 | Package                                                           | Purpose                                                                                                        |
@@ -17,98 +21,22 @@ Each package ships ESM, CommonJS, and TypeScript declarations and can be install
 and versioned independently. Node.js 22 or newer is supported. The Playwright
 adapter requires `@playwright/test >=1.50.0` as a peer dependency.
 
-## Try it without an API key
-
-```sh
-pnpm add semantic-assert
-```
-
-```ts
-import { FakeProvider, Judge, resolveJudgeSettings } from "semantic-assert";
-
-const judge = new Judge({
-  provider: new FakeProvider({ scripts: [{ claim_0: 0.95 }] }),
-  settings: resolveJudgeSettings({ threshold: 0.8 }),
-});
-
-await judge.expectClaims(
-  async () => ({ message: "Your changes have been saved." }),
-  [{ claim: "The message confirms success" }],
-);
-```
-
-`FakeProvider` returns scripted answers; it does not evaluate language.
-
-## Try it with an API key
-
-Use Jev through TypeSafe for real judgments:
+## Installation
 
 ```sh
 pnpm add semantic-assert semantic-assert-typesafe
-export TYPESAFE_API_KEY="your-api-key"
 ```
 
-Save this as `check.mjs`:
+Follow the [quick start](https://mondaychen.github.io/semantic-assert/getting-started.html)
+for provider setup and your first assertion. The docs include before-and-after
+examples for [HTML alerts after copy edits](https://mondaychen.github.io/semantic-assert/examples/html-alerts.html)
+and [generated support replies](https://mondaychen.github.io/semantic-assert/examples/generated-replies.html).
+For tests you can run from this checkout, see the [examples guide](examples/README.md).
 
-```js
-import { Judge, resolveJudgeSettings } from "semantic-assert";
-import { typesafe } from "semantic-assert-typesafe";
-
-const judge = new Judge({
-  provider: typesafe(),
-  settings: resolveJudgeSettings({ threshold: 0.8 }),
-});
-
-await judge.expectClaims(
-  async () => ({ message: "Your changes have been saved." }),
-  [{ claim: "The message confirms success" }],
-  { timeoutMs: 0 }, // Judge this static response once.
-);
-console.log("Semantic assertion passed.");
-```
-
-Run `node check.mjs`. If your key is in `.env`, use
-`node --env-file=.env check.mjs` instead. The built-in templates describe
-arbitrary JSON; the Playwright adapter swaps in templates that name the fields
-of a captured page.
-
-To use Vercel AI Gateway instead, install its adapter and set your Gateway key:
-
-```sh
-pnpm add semantic-assert semantic-assert-ai-sdk
-export AI_GATEWAY_API_KEY="your-api-key"
-```
-
-Replace the `typesafe` import with `import { aiSdk } from "semantic-assert-ai-sdk"`
-and use `provider: aiSdk()` in the same example. It defaults to `typesafe-ai/jev`.
-See the [AI SDK provider guide](packages/semantic-assert-ai-sdk/README.md) for options
-and the [Playwright guide](packages/semantic-assert-playwright/README.md) for UI tests.
-
-To try the examples from a checkout of this repository, follow the
-[runnable examples guide](examples/README.md). Copy `.env.example` to `.env`,
-fill in `AI_GATEWAY_API_KEY`, then run `pnpm install`, `pnpm exec playwright install chromium`, and
-`pnpm examples:gateway --smoke` to try five core and browser tests using at most
-five API requests.
-
-Assertions send captured state to the configured provider. Use the Playwright
-adapter's `redact` hook to remove sensitive data. Keep API keys server-side.
-Model judgments are probabilistic: calibrate thresholds for your provider and
-use ordinary assertions for exact strings, counting, and arithmetic. Cost in
-the usage report is an estimate from rates you configure on the provider
-(`usdPerMtokInput` for TypeSafe, `pricing` for the AI SDK); it reads `n/a`
-until you set them.
-
-## Examples
-
-See the [runnable examples](examples/README.md) for generated-response checks,
-background-job polling, ticket classification, failure evidence, and Playwright
-tests for checkout, error messages, search states, and document highlights.
-Run `pnpm examples:core` or `pnpm examples:playwright` after installing workspace
-dependencies (and Chromium for browser examples). Both default to scripted
-providers with no API key; the guide also shows how to opt into TypeSafe or AI Gateway.
-`pnpm examples:gateway --smoke` loads `.env` and selects five live tests, capped
-at five API requests. This is a smaller starting point for free-tier users.
-Run `pnpm examples:gateway` for the full suite.
+Model judgments are probabilistic. Keep exact strings, counting, and arithmetic
+in ordinary assertions, and calibrate thresholds against your own examples.
+Captured state is sent to the configured provider; redact sensitive data and
+keep API keys server-side.
 
 ## Development
 
@@ -135,6 +63,17 @@ smoke test runs only when `AI_GATEWAY_API_KEY` is set. CI runs
 offline-provider checks on Node 22 and 24; a nightly schedule and manual
 workflow runs also exercise TypeSafe and AI Gateway when their repository
 secrets are configured.
+
+## Documentation development
+
+```sh
+pnpm docs:dev
+pnpm docs:build
+pnpm docs:preview
+```
+
+Docs live in `docs/`. The Documentation workflow checks pull requests and publishes
+changes on `main` to GitHub Pages. The production base path is `/semantic-assert/`.
 
 ## Releases
 

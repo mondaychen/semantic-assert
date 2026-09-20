@@ -30,6 +30,7 @@ Fake token counts are sample values, and cost is unknown.
 | [Ticket routing and search](core/classification.test.ts)        | Mix typed `choice` and `noul` questions; wait for settled classifications and check the result  |
 | [Failure evidence](core/failure-evidence.test.ts)               | Catch `SemanticAssertionError`, inspect probabilities, and attach judged state                  |
 | [Checkout and error messages](playwright/checkout.spec.ts)      | Extend Playwright fixtures, interact with a page, batch claims, scope capture, and redact data  |
+| [Alert copy changes](playwright/alert-copy.spec.ts)             | Accept two wordings of an HTML alert and reject missing recovery guidance in a scoped region    |
 | [Search page classification](playwright/classification.spec.ts) | Distinguish loading, results, empty, and error states                                           |
 | [Document styling](playwright/visual-matchers.spec.ts)          | Locator matchers, negative claims, and visual hints for highlights and struck-through text      |
 
@@ -123,6 +124,27 @@ Run one live suite at a time to keep requests within your account's rate limit.
 The example delay is a starting point, not a guaranteed limit. Vercel does not
 publish fixed per-model numbers; if a run still gets a `429`, wait for the limit
 to recover or increase the delay. See [Gateway rate limits](https://vercel.com/docs/ai-gateway/rate-limits).
+
+### Test HTML alerts across copy changes
+
+The alert example applies the same two claims to the original copy, a PM's
+rewording, and an incomplete message. It expects the first two to pass and catches
+the semantic assertion failure for the third. Each version uses one request with
+two claims and no polling; a live run uses three evaluations.
+
+From the repository root, after building and installing Chromium:
+
+```sh
+# Scripted scores: exercise page capture and the assertion flow without an API key.
+pnpm --filter semantic-assert-examples test:playwright alert-copy.spec.ts
+
+# Actual judgments through AI Gateway, with AI_GATEWAY_API_KEY in .env.
+EXAMPLE_PROVIDER=ai-sdk node --env-file=.env node_modules/@playwright/test/cli.js test --config=examples/playwright.config.ts alert-copy.spec.ts
+```
+
+The alert is captured separately from surrounding help text, so guidance elsewhere
+on the page cannot fill in missing information. Live judgments are probabilistic;
+use the cases to check your provider and threshold against the intended outcomes.
 
 ## Adapt an example
 

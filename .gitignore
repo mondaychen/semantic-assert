@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .turbo/
+docs/.vitepress/cache/
 artifacts/
 test-results/
 playwright-report/
