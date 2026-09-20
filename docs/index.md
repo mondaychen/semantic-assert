@@ -69,7 +69,4 @@ assessment, not proof of correctness.
 Follow the [quick start](./getting-started) for a runnable check, then add the
 [Playwright adapter](./reference/playwright) for HTML and browser tests.
 
-The single-evaluation default is queued for the next package release. With
-already published versions, set `timeoutMs: 0` explicitly to get this behavior.
-
 Node.js 22 or newer is supported. Packages ship ESM, CommonJS, and TypeScript declarations.

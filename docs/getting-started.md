@@ -8,12 +8,6 @@ description: Run your first semantic assertion with TypeSafe, AI Gateway, or a s
 Start with a JSON response. The core judge works independently of your test runner.
 For HTML, follow the [Playwright setup](./reference/playwright#install).
 
-::: tip Package release
-These docs describe the repository's current code. The new single-evaluation
-default is queued for the next package release. With already published versions,
-set `timeoutMs: 0` in `resolveJudgeSettings` or on each assertion to disable polling.
-:::
-
 ## Install
 
 Use Node.js 22 or newer.
