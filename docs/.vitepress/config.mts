@@ -29,6 +29,10 @@ export default defineConfig({
         items: [
           { text: "HTML alerts & copy changes", link: "/examples/html-alerts" },
           { text: "Generated support replies", link: "/examples/generated-replies" },
+          { text: "Checkout confirmations", link: "/examples/checkout" },
+          { text: "Loading vs. empty states", link: "/examples/search-states" },
+          { text: "Highlighted passages", link: "/examples/highlights" },
+          { text: "Answers grounded in a policy", link: "/examples/grounded-answers" },
         ],
       },
       {

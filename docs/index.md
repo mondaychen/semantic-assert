@@ -31,6 +31,13 @@ and other JSON, use the framework-independent [core judge](./reference/core).
   </a>
 </div>
 
+More before-and-after examples:
+
+- [Checkout confirmations](./examples/checkout): “Thanks” appears, but the customer still does not know whether the order succeeded.
+- [Loading vs. empty states](./examples/search-states): zero rows can mean no results, a pending request, or an error.
+- [Highlighted passages](./examples/highlights): a highlight exists, but it is on the wrong passage.
+- [Answers grounded in a policy](./examples/grounded-answers): the answer contains the right keywords and gives the wrong advice.
+
 ## How it works
 
 1. **Capture state.** Return JSON from your application, or capture a page with Playwright.
