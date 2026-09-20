@@ -4,9 +4,9 @@ Assert plain-English claims about captured state, with a model as the judge.
 Batch claims into one request, retry while state changes, and keep thresholds,
 pass/fail decisions, and usage metrics in code.
 
-**[Documentation](https://mondaychen.github.io/semantic-assert/)** ·
-[Quick start](https://mondaychen.github.io/semantic-assert/getting-started.html) ·
-[HTML and Playwright](https://mondaychen.github.io/semantic-assert/examples/html-alerts.html)
+**[Documentation](https://mengdi.dev/semantic-assert/)** ·
+[Quick start](https://mengdi.dev/semantic-assert/getting-started.html) ·
+[HTML and Playwright](https://mengdi.dev/semantic-assert/examples/html-alerts.html)
 
 ## Packages
 
@@ -27,10 +27,10 @@ adapter requires `@playwright/test >=1.50.0` as a peer dependency.
 pnpm add semantic-assert semantic-assert-typesafe
 ```
 
-Follow the [quick start](https://mondaychen.github.io/semantic-assert/getting-started.html)
+Follow the [quick start](https://mengdi.dev/semantic-assert/getting-started.html)
 for provider setup and your first assertion. The docs include before-and-after
-examples for [HTML alerts after copy edits](https://mondaychen.github.io/semantic-assert/examples/html-alerts.html)
-and [generated support replies](https://mondaychen.github.io/semantic-assert/examples/generated-replies.html).
+examples for [HTML alerts after copy edits](https://mengdi.dev/semantic-assert/examples/html-alerts.html)
+and [generated support replies](https://mengdi.dev/semantic-assert/examples/generated-replies.html).
 For tests you can run from this checkout, see the [examples guide](examples/README.md).
 
 Model judgments are probabilistic. Keep exact strings, counting, and arithmetic

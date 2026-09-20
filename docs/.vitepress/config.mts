@@ -8,7 +8,7 @@ export default defineConfig({
   base: "/semantic-assert/",
   appearance: false,
   lastUpdated: false,
-  sitemap: { hostname: "https://mondaychen.github.io/semantic-assert/" },
+  sitemap: { hostname: "https://mengdi.dev/semantic-assert/" },
   head: [["meta", { name: "theme-color", content: "#42b983" }]],
   themeConfig: {
     nav: [
