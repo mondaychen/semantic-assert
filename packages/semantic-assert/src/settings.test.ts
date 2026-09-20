@@ -9,6 +9,7 @@ describe("resolveJudgeSettings", () => {
   afterEach(() => {
     delete process.env.SEMANTIC_ASSERT_THRESHOLD;
     delete process.env.SEMANTIC_ASSERT_TIMEOUT_MS;
+    delete process.env.SEMANTIC_ASSERT_POLL_MS;
   });
 
   it("uses built-in defaults", () => {
@@ -37,6 +38,14 @@ describe("resolveJudgeSettings", () => {
     expect(() => resolveJudgeSettings({ threshold: 0.3 })).toThrow(/between 0.5 and 1/);
     process.env.SEMANTIC_ASSERT_THRESHOLD = "1.5";
     expect(() => resolveJudgeSettings()).toThrow(/between 0.5 and 1/);
+  });
+
+  it("rejects negative timing values", () => {
+    expect(() => resolveJudgeSettings({ timeoutMs: -1 })).toThrow(
+      /timeoutMs must be a non-negative/,
+    );
+    process.env.SEMANTIC_ASSERT_POLL_MS = "-5000";
+    expect(() => resolveJudgeSettings()).toThrow(/pollIntervalMs must be a non-negative/);
   });
 
   it("falls back to defaults on runtimes without a process global", () => {

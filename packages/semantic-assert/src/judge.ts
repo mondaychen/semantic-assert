@@ -12,14 +12,17 @@ import {
   type ClaimTemplate,
   type ClassificationTemplate,
   type JudgeSettings,
+  assertValidDuration,
   assertValidThreshold,
 } from "./settings";
 import type { ChoiceAnswer, JsonValue, Provider, ProviderResult, Questions } from "./types";
 
 /**
  * Thrown by a `Capture` when the state cannot be produced yet (a region has
- * not rendered, a response has not arrived). The engine retries until the
- * deadline, then lets the error surface.
+ * not rendered, a response has not arrived). With polling enabled (a positive
+ * `timeoutMs`), the engine re-captures while time remains before the deadline.
+ * At the default zero timeout it is thrown to the caller as is, without a
+ * model call.
  */
 export class NotReadyError extends Error {
   constructor(message: string) {
@@ -28,8 +31,22 @@ export class NotReadyError extends Error {
   }
 }
 
-/** Produces the state to judge. Throw `NotReadyError` to ask for another poll. */
-export type Capture = () => Promise<JsonValue>;
+/** What the engine tells a `Capture` about the assertion it serves. */
+export interface CaptureContext {
+  /**
+   * Epoch milliseconds when polling stops. Present only while the assertion
+   * polls (a positive `timeoutMs`). A capture that waits for its own target
+   * can cap that wait here so it does not outlast the assertion.
+   */
+  pollingDeadline?: number;
+}
+
+/**
+ * Produces the state to judge. Throwing `NotReadyError` asks for another poll
+ * when polling is enabled; otherwise the error surfaces to the caller. The
+ * context argument may be ignored.
+ */
+export type Capture = (context: CaptureContext) => Promise<JsonValue>;
 
 export interface JudgeHooks {
   /** Pause between polls, e.g. Playwright's page.waitForTimeout. Defaults to a timer. */
@@ -40,6 +57,16 @@ export interface JudgeHooks {
 
 function defaultWait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Whether one more poll fits before the deadline. Strict, so a zero timeout
+ * (deadline is now) never polls, and neither does a zero interval right at the
+ * deadline. Both the not-ready path and the failed-answer path use this, so
+ * they agree on when polling ends.
+ */
+function canPollAgain(deadline: number, pollIntervalMs: number): boolean {
+  return Date.now() + pollIntervalMs < deadline;
 }
 
 export interface Claim {
@@ -73,11 +100,13 @@ export interface ExpectClaimsOptions extends TimingOptions {
 
 export interface ClassifyOptions<Option extends string> extends TimingOptions {
   /**
-   * Options that count as a settled state. State is re-captured while the
-   * chosen option is not one of these, until the timeout, when the last answer
-   * is returned regardless. Omit to accept the first answer. Leave out options
-   * the caller treats as failures, so a half-rendered page that looks like an
-   * error keeps polling instead of failing early.
+   * Options that count as a settled state. Only matters with a positive
+   * `timeoutMs`: state is then re-captured while the chosen option is not one
+   * of these, until the timeout, when the last answer is returned regardless.
+   * Omit to accept the first answer. Leave out options the caller treats as
+   * failures, so a half-rendered page that looks like an error keeps polling
+   * instead of failing early. At the default zero timeout the first answer is
+   * returned whether or not it is settled.
    */
   settled?: readonly NoInfer<Option>[];
   /** Question wording; defaults to the settings' `classification` template. */
@@ -164,27 +193,27 @@ export class Judge {
   }
 
   private timing(options: TimingOptions): { timeoutMs: number; pollIntervalMs: number } {
+    if (options.timeoutMs !== undefined)
+      assertValidDuration(options.timeoutMs, "timeoutMs", "assertion option");
+    if (options.pollIntervalMs !== undefined)
+      assertValidDuration(options.pollIntervalMs, "pollIntervalMs", "assertion option");
     return {
       timeoutMs: options.timeoutMs ?? this.settings.timeoutMs,
       pollIntervalMs: options.pollIntervalMs ?? this.settings.pollIntervalMs,
     };
   }
 
-  /** Capture state, or return null while the capture is not ready and time remains. */
+  /** Capture state, or return null while the capture is not ready and another poll fits. */
   private async captureOrWait(
     capture: Capture,
+    timeoutMs: number,
     deadline: number,
     pollIntervalMs: number,
   ): Promise<JsonValue | null> {
     try {
-      return await capture();
+      return await capture(timeoutMs > 0 ? { pollingDeadline: deadline } : {});
     } catch (error) {
-      if (
-        error instanceof NotReadyError &&
-        Date.now() < deadline &&
-        Date.now() + pollIntervalMs <= deadline
-      )
-        return null;
+      if (error instanceof NotReadyError && canPollAgain(deadline, pollIntervalMs)) return null;
       throw error;
     }
   }
@@ -221,7 +250,7 @@ export class Judge {
     let polls = 0;
 
     for (;;) {
-      const state = await this.captureOrWait(capture, deadline, pollIntervalMs);
+      const state = await this.captureOrWait(capture, timeoutMs, deadline, pollIntervalMs);
       if (state === null) {
         await this.wait(pollIntervalMs);
         continue;
@@ -242,7 +271,7 @@ export class Judge {
         await this.attach("semantic-answers", summary);
         return lastResults;
       }
-      if (timeoutMs === 0 || Date.now() + pollIntervalMs > deadline) {
+      if (!canPollAgain(deadline, pollIntervalMs)) {
         await this.attach("semantic-answers", summary);
         await this.attach("semantic-state", lastState);
         throw new SemanticAssertionError(
@@ -274,7 +303,7 @@ export class Judge {
     const deadline = Date.now() + timeoutMs;
     let polls = 0;
     for (;;) {
-      const state = await this.captureOrWait(capture, deadline, pollIntervalMs);
+      const state = await this.captureOrWait(capture, timeoutMs, deadline, pollIntervalMs);
       if (state === null) {
         await this.wait(pollIntervalMs);
         continue;
@@ -283,7 +312,7 @@ export class Judge {
       const { answers, model } = await this.ask(state, { classification: question });
       const answer = answers.classification;
       const isSettled = settled === null || settled.has(answer.choice);
-      if (isSettled || timeoutMs === 0 || Date.now() + pollIntervalMs > deadline) {
+      if (isSettled || !canPollAgain(deadline, pollIntervalMs)) {
         await this.attach("semantic-classification", {
           model,
           polls,

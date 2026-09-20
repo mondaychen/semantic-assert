@@ -46,9 +46,11 @@ More before-and-after examples:
 2. **Write claims.** Describe the observable behavior. Related claims share one provider request.
 3. **Assert a result.** The judge compares the returned probabilities with your thresholds.
 
-Assertions evaluate once by default (`timeoutMs: 0`). Wait for the target with
-Playwright before judging it. For changing state, opt into repeated checks with
-a positive `timeoutMs`, such as `5000`.
+Assertions evaluate once by default (`timeoutMs: 0`). A Playwright `region` waits
+for its element to attach, up to 5 s, before that single evaluation. Wait for
+visibility or your application's ready state yourself when content settles later.
+For changing state, opt into repeated checks with a positive `timeoutMs`, such as
+`5000`.
 Usage metrics record calls, tokens, and provider wait time.
 
 ## Where semantic assertions fit

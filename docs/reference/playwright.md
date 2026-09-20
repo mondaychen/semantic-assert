@@ -79,6 +79,12 @@ await judge.expectPageTo("The alert explains how to recover", { region: alert })
 element appears before its final content arrives, wait for your application's
 ready state as well.
 
+A `region` capture waits for its element on its own, up to `regionTimeoutMs`
+(default 5 s, the same as Playwright's `expect` timeout). That wait happens in the
+browser and sends nothing to the model, so it is separate from `timeoutMs`. Set it
+per call or for the suite in `judgeOptions`; a region that never appears fails
+with `RegionNotFoundError`.
+
 For content you want the judge to keep checking, opt into polling:
 
 ```ts
@@ -104,7 +110,7 @@ await judge.expectPageTo("The message confirms that the purchase succeeded", {
 ```
 
 Use `expectPage` to batch multiple claims. Use `expectPageNotTo` for one negative
-claim. Both support per-call thresholds and polling options.
+claim. Both support per-call thresholds, polling options, and `regionTimeoutMs`.
 
 ## Matcher syntax
 
@@ -124,8 +130,9 @@ await expect(page.getByTestId("agent-panel")).toSatisfyAll([
 ]);
 ```
 
-These semantic matchers reject `.not`. Use `expected: false` to require evidence
-for a negative claim.
+Like built-in locator matchers, these wait for the locator to attach, up to
+`regionTimeoutMs`, and then evaluate once. They reject `.not`. Use `expected: false`
+to require evidence for a negative claim.
 
 ## Redact sensitive data
 

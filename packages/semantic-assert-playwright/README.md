@@ -60,8 +60,8 @@ which name the captured page's fields, on top of the core defaults; pass
 the config's `use` for the whole suite, or in `test.use` per file or describe
 block. `judgeProvider` is given where `test` is built, as above. Each call can still override
 `threshold`, `timeoutMs`, `pollIntervalMs`, `region` (Locator or selector),
-`includeLinks`, `extraState` and a `redact` hook that runs before anything is
-sent to the API.
+`regionTimeoutMs`, `includeLinks`, `extraState` and a `redact` hook that runs
+before anything is sent to the API.
 
 ## Wait first, then judge once
 
@@ -78,6 +78,11 @@ Visibility does not guarantee that content has finished updating. Wait for your
 application's ready state as well when needed. To have the judge recapture changing
 content, opt into polling with `{ timeoutMs: 5_000 }` on the assertion or in
 `judgeOptions`. Provider request retries are configured separately.
+
+A `region` capture, including `expect(locator).toSatisfy()`, waits for its element
+to attach for up to `regionTimeoutMs` (default 5 s, like Playwright's `expect`
+timeout). This wait runs in the browser and costs no model requests, so it stays
+separate from `timeoutMs`. Set it per call or in `judgeOptions`.
 
 ## Visual hints
 

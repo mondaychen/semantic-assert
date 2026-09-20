@@ -20,6 +20,14 @@ describe("PageJudge", () => {
     expect(judge.settings.templates.urlClaim).toBe(defaultTemplates.urlClaim);
   });
 
+  it("defaults the region wait to Playwright's expect timeout and keeps it out of judge settings", () => {
+    const judge = new PageJudge(page, undefined, new FakeProvider());
+    expect(judge.regionTimeoutMs).toBe(5000);
+    const custom = new PageJudge(page, undefined, new FakeProvider(), { regionTimeoutMs: 250 });
+    expect(custom.regionTimeoutMs).toBe(250);
+    expect(custom.settings).not.toHaveProperty("regionTimeoutMs");
+  });
+
   it("lets judge options replace individual page templates", () => {
     const claim = (c: string) => ({ type: "noul" as const, instructions: c });
     const judge = new PageJudge(page, undefined, new FakeProvider(), { templates: { claim } });

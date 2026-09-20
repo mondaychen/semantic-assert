@@ -8,9 +8,20 @@ import { NotReadyError } from "semantic-assert";
 import { RegionNotFoundError, capturePageState } from "./page-state";
 
 /** Just enough of a Playwright Page for capturePageState. */
-function fakePage(snapshot: string, regionCount = 1): Page {
+function fakePage(snapshot: string, regionCount = 1) {
+  const waits: number[] = [];
   const locator = {
     count: async () => regionCount,
+    first: () => ({
+      waitFor: async ({ timeout }: { timeout: number }) => {
+        waits.push(timeout);
+        if (regionCount === 0) {
+          const error = new Error(`locator.waitFor: Timeout ${timeout}ms exceeded.`);
+          error.name = "TimeoutError";
+          throw error;
+        }
+      },
+    }),
     ariaSnapshot: async () => snapshot,
     getByRole: () => ({ evaluateAll: async () => [{ name: "Home", href: "/" }] }),
     evaluate: async (_fn: unknown, options: unknown) => [
@@ -21,7 +32,7 @@ function fakePage(snapshot: string, regionCount = 1): Page {
       },
     ],
   };
-  return {
+  const page = {
     url: () => "https://x.test/p",
     title: async () => "T",
     locator: () => locator,
@@ -30,6 +41,7 @@ function fakePage(snapshot: string, regionCount = 1): Page {
       throw new Error("page-wide link lookup");
     },
   } as unknown as Page;
+  return Object.assign(page, { waits });
 }
 
 describe("capturePageState", () => {
@@ -56,10 +68,72 @@ describe("capturePageState", () => {
     expect(state.links).toEqual([{ name: "Home", href: "/" }]);
   });
 
-  it("reports a missing region as not ready", async () => {
+  it("waits for the region with Playwright's default expect timeout, then reports not ready", async () => {
+    const page = fakePage("", 0);
+    const error = await capturePageState(page, { maxChars: 10, region: "main" }).catch(
+      (e: unknown) => e,
+    );
+    expect(error).toBeInstanceOf(RegionNotFoundError);
+    expect((error as Error).message).toMatch(/did not appear .* within 5000ms/);
+    expect((error as Error).message).toMatch(/locator\.waitFor\(\)/);
+    expect(page.waits).toEqual([5000]);
+  });
+
+  it("waits no longer than regionTimeoutMs", async () => {
+    const page = fakePage("- main", 1);
+    await capturePageState(page, { maxChars: 10, region: "main", regionTimeoutMs: 250 });
+    expect(page.waits).toEqual([250]);
+  });
+
+  it("caps the region wait at the remaining polling time", async () => {
+    const page = fakePage("- main", 1);
+    await capturePageState(
+      page,
+      { maxChars: 10, region: "main", regionTimeoutMs: 5000 },
+      { pollingDeadline: Date.now() + 1000 },
+    );
+    expect(page.waits).toHaveLength(1);
+    expect(page.waits[0]).toBeGreaterThan(0);
+    expect(page.waits[0]).toBeLessThanOrEqual(1000);
+  });
+
+  it("checks once without waiting when regionTimeoutMs is 0 or no polling time remains", async () => {
+    const immediate = fakePage("", 0);
     await expect(
-      capturePageState(fakePage("", 0), { maxChars: 10, region: "main" }),
+      capturePageState(immediate, { maxChars: 10, region: "main", regionTimeoutMs: 0 }),
     ).rejects.toBeInstanceOf(RegionNotFoundError);
+    expect(immediate.waits).toEqual([]);
+
+    const expired = fakePage("", 0);
+    await expect(
+      capturePageState(
+        expired,
+        { maxChars: 10, region: "main" },
+        { pollingDeadline: Date.now() - 1 },
+      ),
+    ).rejects.toBeInstanceOf(RegionNotFoundError);
+    expect(expired.waits).toEqual([]);
+  });
+
+  it("rejects a negative region timeout", async () => {
+    await expect(
+      capturePageState(fakePage("- x"), { maxChars: 10, region: "main", regionTimeoutMs: -1 }),
+    ).rejects.toThrow(/regionTimeoutMs must be a non-negative/);
+  });
+
+  it("rethrows waitFor failures that are not timeouts", async () => {
+    const page = fakePage("- x", 1);
+    page.locator = () =>
+      ({
+        first: () => ({
+          waitFor: async () => {
+            throw new Error("Target page, context or browser has been closed");
+          },
+        }),
+      }) as never;
+    await expect(capturePageState(page, { maxChars: 10, region: "main" })).rejects.toThrow(
+      /has been closed/,
+    );
   });
 
   it("rejects an ambiguous region with a plain error, not a retry", async () => {

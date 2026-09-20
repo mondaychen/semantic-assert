@@ -74,7 +74,11 @@ await judge.expectClaims(
 
 With polling enabled, throw `NotReadyError` from the callback when the state cannot
 be captured yet and the judge should try again. At the default zero timeout, that
-error is returned immediately without a model call.
+error is thrown to the caller without a model call.
+
+The callback receives a context object. While polling, its `pollingDeadline` is the
+epoch time when polling stops, so a capture that waits for its own target can cap
+that wait. The Playwright adapter uses it for its region wait.
 
 `timeoutMs` bounds polling, not an individual provider request. An in-flight
 request can finish after the polling deadline. Set the provider's request timeout

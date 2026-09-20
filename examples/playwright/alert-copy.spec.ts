@@ -46,11 +46,15 @@ for (const { name, copy, shouldPass } of cases) {
       { region: alert },
     );
 
-    if (shouldPass) {
-      await judgment;
-    } else {
-      await expect(judgment).rejects.toThrow(SemanticAssertionError);
+    try {
+      if (shouldPass) {
+        await judgment;
+      } else {
+        await expect(judgment).rejects.toThrow(SemanticAssertionError);
+      }
+    } finally {
+      // Record the model usage for the reporter even when the judgment fails.
+      await judge.attachMetrics();
     }
-    await judge.attachMetrics();
   });
 }

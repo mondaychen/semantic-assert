@@ -1,8 +1,8 @@
 # semantic-assert
 
 Assert plain-English claims about captured state, with a model as the judge.
-Batch claims into one request, retry while state changes, and keep thresholds,
-pass/fail decisions, and usage metrics in code.
+Batch claims into one request, poll changing state when you ask for it, and keep
+thresholds, pass/fail decisions, and usage metrics in code.
 
 **[Documentation](https://mengdi.dev/semantic-assert/)** ·
 [Quick start](https://mengdi.dev/semantic-assert/getting-started.html) ·

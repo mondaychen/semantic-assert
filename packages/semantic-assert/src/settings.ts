@@ -129,6 +129,18 @@ export function assertValidThreshold(threshold: number, source: string): void {
   }
 }
 
+/**
+ * Timing values are durations in milliseconds. A negative interval would let a
+ * poll loop outlive its deadline, so both must be finite and non-negative.
+ */
+export function assertValidDuration(value: number, name: string, source: string): void {
+  if (!Number.isFinite(value) || value < 0) {
+    throw new Error(
+      `${source}: ${name} must be a non-negative number of milliseconds, got ${value}`,
+    );
+  }
+}
+
 export function resolveJudgeSettings(overrides: JudgeSettingsOverrides = {}): JudgeSettings {
   const settings: JudgeSettings = {
     threshold:
@@ -143,5 +155,7 @@ export function resolveJudgeSettings(overrides: JudgeSettingsOverrides = {}): Ju
     templates: { ...defaultTemplates, ...overrides.templates },
   };
   assertValidThreshold(settings.threshold, "judge settings");
+  assertValidDuration(settings.timeoutMs, "timeoutMs", "judge settings");
+  assertValidDuration(settings.pollIntervalMs, "pollIntervalMs", "judge settings");
   return settings;
 }

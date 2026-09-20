@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Locator, Page } from "@playwright/test";
-import { type JsonValue, NotReadyError, truncateText } from "semantic-assert";
+import { type CaptureContext, type JsonValue, NotReadyError, truncateText } from "semantic-assert";
 
 import { type VisualHintsOptions, collectVisualHints } from "./visual-hints";
 
@@ -23,13 +23,28 @@ export interface PageState {
   aria_snapshot: string;
 }
 
+/**
+ * How long a capture waits for its `region` to attach, in milliseconds. Matches
+ * Playwright's default `expect` timeout, so a semantic assertion on a locator
+ * waits the way a built-in locator assertion does.
+ */
+export const DEFAULT_REGION_TIMEOUT_MS = 5_000;
+
 export interface CapturePageStateOptions {
   /**
    * Scope the snapshot to a Locator or CSS selector. Defaults to the whole
-   * body. A region that is not on the page yet is reported as not ready so
-   * polling assertions retry.
+   * body. The capture waits up to `regionTimeoutMs` for the region to attach,
+   * then reports it as not ready.
    */
   region?: Locator | string;
+  /**
+   * How long to wait for `region` to attach before giving up, in
+   * milliseconds. Defaults to `DEFAULT_REGION_TIMEOUT_MS` (5 s). This is a
+   * browser-side wait and costs no model requests; it is separate from
+   * `timeoutMs`, which governs re-evaluation by the model. Set 0 to check
+   * once without waiting.
+   */
+  regionTimeoutMs?: number;
   /** Also collect the region's link accessible names and hrefs; aria snapshots omit hrefs. */
   includeLinks?: boolean;
   /**
@@ -53,34 +68,76 @@ export interface CapturePageStateOptions {
   redact?: (state: PageState) => PageState;
 }
 
-/** The scoped region is not on the page (yet). Poll loops retry on this. */
+/**
+ * The scoped region did not attach within the region wait. A `NotReadyError`,
+ * so an assertion that polls (positive `timeoutMs`) re-captures while time
+ * remains; a single evaluation surfaces it to the caller.
+ */
 export class RegionNotFoundError extends NotReadyError {
-  constructor(region: string, url: string) {
+  constructor(region: string, url: string, waitedMs: number) {
     super(
-      `Region "${region}" was not found on ${url}. Use a selector that exists on this page, or omit the region to snapshot the whole page.`,
+      `Region "${region}" did not appear on ${url} within ${waitedMs}ms. Wait for it first (await locator.waitFor()), raise regionTimeoutMs, or check the selector. Omit the region to snapshot the whole page.`,
     );
     this.name = "RegionNotFoundError";
+  }
+}
+
+function isTimeoutError(error: unknown): boolean {
+  return error instanceof Error && error.name === "TimeoutError";
+}
+
+/**
+ * Wait for the region to attach, for up to `regionTimeoutMs` or the remaining
+ * polling time, whichever is shorter. A zero budget checks once. Playwright
+ * treats a zero `waitFor` timeout as unlimited, so it is never passed through.
+ */
+async function waitForRegion(
+  target: Locator,
+  regionLabel: string,
+  url: () => string,
+  regionTimeoutMs: number,
+  context: CaptureContext,
+): Promise<void> {
+  const remaining =
+    context.pollingDeadline === undefined ? Infinity : context.pollingDeadline - Date.now();
+  const budget = Math.max(0, Math.ceil(Math.min(regionTimeoutMs, remaining)));
+  if (budget === 0) {
+    if ((await target.count()) === 0) throw new RegionNotFoundError(regionLabel, url(), 0);
+    return;
+  }
+  try {
+    await target.first().waitFor({ state: "attached", timeout: budget });
+  } catch (error) {
+    if (isTimeoutError(error)) throw new RegionNotFoundError(regionLabel, url(), budget);
+    throw error;
   }
 }
 
 export async function capturePageState(
   page: Page,
   options: CapturePageStateOptions & { maxChars: number },
+  context: CaptureContext = {},
 ): Promise<PageState> {
   const {
     region = "body",
+    regionTimeoutMs = DEFAULT_REGION_TIMEOUT_MS,
     includeLinks = false,
     visualHints = false,
     maxChars,
     extraState = {},
     redact,
   } = options;
+  if (!Number.isFinite(regionTimeoutMs) || regionTimeoutMs < 0) {
+    throw new Error(
+      `regionTimeoutMs must be a non-negative number of milliseconds, got ${regionTimeoutMs}`,
+    );
+  }
   const target = typeof region === "string" ? page.locator(region) : region;
   const regionLabel = typeof region === "string" ? region : String(region);
 
   if (region !== "body") {
+    await waitForRegion(target, regionLabel, () => page.url(), regionTimeoutMs, context);
     const matches = await target.count();
-    if (matches === 0) throw new RegionNotFoundError(regionLabel, page.url());
     if (matches > 1) {
       // Not a NotReadyError: more matches will not resolve by polling.
       throw new Error(

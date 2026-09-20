@@ -42,6 +42,38 @@ base.describe("createJudgeExpect", () => {
     baseExpect(base.info().attachments.map((a) => a.name)).toContain("semantic-state");
   });
 
+  base(
+    "waits for a locator that renders later, like built-in locator matchers",
+    async ({ page }) => {
+      await page.setContent(PAGE);
+      const provider = new FakeProvider({ scripts: [{ claim_0: 0.95 }] });
+      const expect = createJudgeExpect({ provider });
+      await page.evaluate(() => {
+        setTimeout(() => {
+          const alert = document.createElement("p");
+          alert.setAttribute("role", "alert");
+          alert.textContent = "Saved.";
+          document.querySelector("main")?.append(alert);
+        }, 300);
+      });
+
+      await expect(page.getByRole("alert")).toSatisfy("The alert confirms the save");
+      baseExpect(JSON.stringify(provider.requests[0]?.state)).toContain("Saved.");
+    },
+  );
+
+  base("gives up on a locator that never renders after regionTimeoutMs", async ({ page }) => {
+    await page.setContent(PAGE);
+    const provider = new FakeProvider();
+    const expect = createJudgeExpect({ provider, options: { regionTimeoutMs: 200 } });
+    const startedAt = Date.now();
+    await baseExpect(expect(page.getByRole("alert")).toSatisfy("anything")).rejects.toThrow(
+      /did not appear .* within 200ms/,
+    );
+    baseExpect(Date.now() - startedAt).toBeLessThan(5000);
+    baseExpect(provider.requests).toHaveLength(0);
+  });
+
   base("rejects .not", async ({ page }) => {
     await page.setContent(PAGE);
     const expect = createJudgeExpect({ provider: new FakeProvider() });

@@ -3,6 +3,7 @@
 
 import type { Page, TestInfo } from "@playwright/test";
 import {
+  type CaptureContext,
   type ChoiceAnswer,
   type Claim,
   type ClaimResult,
@@ -21,14 +22,26 @@ import {
   resolveJudgeSettings,
 } from "semantic-assert";
 
-import { type CapturePageStateOptions, capturePageState } from "./page-state";
+import {
+  type CapturePageStateOptions,
+  DEFAULT_REGION_TIMEOUT_MS,
+  capturePageState,
+} from "./page-state";
 import { pageTemplates } from "./page-templates";
 
 export interface PageAssertOptions extends CapturePageStateOptions, ExpectClaimsOptions {}
 export interface PageClassifyOptions<Option extends string>
   extends CapturePageStateOptions, ClassifyOptions<Option> {}
 
-export type PageJudgeOptions = JudgeSettingsOverrides;
+export interface PageJudgeOptions extends JudgeSettingsOverrides {
+  /**
+   * Suite-level default for how long a capture waits for its `region` to
+   * attach, in milliseconds. Browser-side only; no model requests. Defaults
+   * to 5 s, like Playwright's `expect` timeout. Each call may still override
+   * it with its own `regionTimeoutMs`.
+   */
+  regionTimeoutMs?: number;
+}
 
 /**
  * Scenario-scoped facade over the core Judge for one Playwright page. Evidence
@@ -37,6 +50,8 @@ export type PageJudgeOptions = JudgeSettingsOverrides;
 export class PageJudge {
   readonly judge: Judge;
   readonly settings: JudgeSettings;
+  /** How long captures wait for a `region` unless a call says otherwise. */
+  readonly regionTimeoutMs: number;
 
   constructor(
     private readonly page: Page,
@@ -44,8 +59,10 @@ export class PageJudge {
     provider: Provider,
     options: PageJudgeOptions = {},
   ) {
+    const { regionTimeoutMs = DEFAULT_REGION_TIMEOUT_MS, ...judgeOverrides } = options;
+    this.regionTimeoutMs = regionTimeoutMs;
     this.settings = resolveJudgeSettings({
-      ...options,
+      ...judgeOverrides,
       templates: { ...pageTemplates, ...options.templates },
     });
     this.judge = new Judge({
@@ -65,7 +82,16 @@ export class PageJudge {
   }
 
   private capture(options: CapturePageStateOptions) {
-    return () => capturePageState(this.page, { maxChars: this.settings.maxStateChars, ...options });
+    return (context: CaptureContext) =>
+      capturePageState(
+        this.page,
+        {
+          maxChars: this.settings.maxStateChars,
+          regionTimeoutMs: this.regionTimeoutMs,
+          ...options,
+        },
+        context,
+      );
   }
 
   /** Assert natural-language claims about the page, all in one model request. */
@@ -83,7 +109,10 @@ export class PageJudge {
     return result!;
   }
 
-  /** Pick one option describing the page; polls until a `settled` option is chosen. */
+  /**
+   * Pick one option describing the page. Evaluates once by default; with a
+   * positive `timeoutMs`, polls until a `settled` option is chosen.
+   */
   classifyPage<Option extends string>(
     instructions: string,
     criteria: Record<Option, string>,

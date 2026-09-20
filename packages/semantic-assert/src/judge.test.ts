@@ -4,7 +4,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { FakeProvider, type Script } from "./fake-provider";
-import { Judge, NotReadyError, SemanticAssertionError } from "./judge";
+import { type CaptureContext, Judge, NotReadyError, SemanticAssertionError } from "./judge";
 import { resolveJudgeSettings } from "./settings";
 
 function makeJudge(scripts: Script[], timing = { timeoutMs: 3000, pollIntervalMs: 1000 }) {
@@ -84,6 +84,37 @@ describe("Judge.expectClaims", () => {
     expect(capture).toHaveBeenCalledTimes(1);
     expect(provider.requests).toHaveLength(0);
     expect(wait).not.toHaveBeenCalled();
+  });
+
+  it("hands the capture a polling deadline only when polling is enabled", async () => {
+    const { judge } = makeJudge([{ claim_0: 0.9 }, { claim_0: 0.9 }], {
+      timeoutMs: 0,
+      pollIntervalMs: 1000,
+    });
+    const contexts: CaptureContext[] = [];
+    const capture = async (context: CaptureContext) => {
+      contexts.push(context);
+      return "s";
+    };
+    await judge.expectClaims(capture, [{ claim: "c" }]);
+    expect(contexts).toEqual([{}]);
+
+    const before = Date.now();
+    await judge.expectClaims(capture, [{ claim: "c" }], { timeoutMs: 5000 });
+    expect(contexts[1]!.pollingDeadline).toBeGreaterThanOrEqual(before + 5000);
+  });
+
+  it("rejects negative or non-finite timing options", async () => {
+    const { judge } = makeJudge([{ claim_0: 0.9 }]);
+    await expect(
+      judge.expectClaims(async () => "s", [{ claim: "c" }], { pollIntervalMs: -1 }),
+    ).rejects.toThrow(/pollIntervalMs must be a non-negative/);
+    await expect(
+      judge.expectClaims(async () => "s", [{ claim: "c" }], { timeoutMs: Number.NaN }),
+    ).rejects.toThrow(/timeoutMs must be a non-negative/);
+    await expect(
+      judge.classify(async () => "s", "q", { a: "A" }, { timeoutMs: Infinity }),
+    ).rejects.toThrow(/timeoutMs must be a non-negative/);
   });
 
   it("passes when every claim clears its threshold, using per-claim overrides", async () => {

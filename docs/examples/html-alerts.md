@@ -93,7 +93,8 @@ assertion failure.
 
 Replace the example's `page.setContent(...)` with `page.goto(...)` and the actions
 that trigger your alert. Keep the role-based locator, visibility check, and claims.
-Wait for the alert with `await expect(alert).toBeVisible()` or
-`await alert.waitFor({ state: "visible" })` before judging it. If its content is
-still changing, wait for the application's ready state or explicitly opt into
-semantic polling with a positive `timeoutMs`.
+The `region` capture waits up to `regionTimeoutMs` (5 s by default) for the alert
+to attach, so a late render does not fail the test. Waiting for it yourself with
+`await expect(alert).toBeVisible()` still gives a clearer failure when the alert
+never shows. If its content is still changing, wait for the application's ready
+state or explicitly opt into semantic polling with a positive `timeoutMs`.
