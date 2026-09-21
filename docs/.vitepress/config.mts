@@ -6,6 +6,8 @@ export default defineConfig({
     "Test what your app means. Semantic assertions for JSON, generated responses, and Playwright pages.",
   lang: "en-US",
   base: "/semantic-assert/",
+  // Contributor notes, not site pages.
+  srcExclude: ["STYLE.md", "CLAUDE.md"],
   appearance: false,
   lastUpdated: false,
   sitemap: { hostname: "https://mengdi.dev/semantic-assert/" },

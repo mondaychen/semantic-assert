@@ -5,8 +5,8 @@ description: Go beyond a thank-you message to check that checkout confirms the p
 
 # “Thanks” is visible. Did the order succeed?
 
-The checkout test clicks the button and finds a thank-you message. It passes even
-if the page never confirms the purchase or tells the customer what happens next.
+Your checkout test clicks the button and finds a thank-you message. It passes even
+when the page never confirms the purchase or tells the customer what happens next.
 
 ## Before: look for a reassuring word
 
@@ -18,12 +18,13 @@ await expect(confirmation).toContainText(/thanks|thank you/i);
 ```
 
 “Thanks for your patience. We're still trying to process your payment” satisfies
-this check. “Order confirmed. We'll email you when it ships” does not.
+this check. “Order confirmed. We'll email you when it ships” doesn't.
 
 ## After: check the customer's next decision
 
-With the [Playwright judge fixture](../reference/playwright#fixture), keep exact
-identifiers in ordinary assertions and describe the confirmation's meaning:
+With the [Playwright judge fixture](../reference/playwright#fixture), keep the
+exact identifier in an ordinary assertion and describe what the confirmation has
+to tell the customer:
 
 ```ts
 await page.getByRole("button", { name: "Place order" }).click();
@@ -41,24 +42,26 @@ await judge.expectPage(
 );
 ```
 
-These claims test whether the page gives the customer enough information to stop
-trying to pay and wait for shipping updates. Playwright waits for the confirmation
-to be visible and contain the expected order ID, then the judge evaluates once.
-All three claims share one provider request. If the message continues to change,
-wait for the application's ready state or opt into polling with a positive `timeoutMs`.
+These claims ask whether the customer has enough information to stop trying to
+pay and wait for shipping updates. Playwright waits for the confirmation to be
+visible and to contain the order ID. Then the judge evaluates all three claims in
+one request. If the message keeps changing after that, wait for your
+application's ready state or opt into polling with a positive `timeoutMs`.
 
-## Wording can change; the requirement stays
+## Wording can change. The requirement stays.
 
 | Confirmation text                                                                | Intended outcome      | Reason                                             |
 | -------------------------------------------------------------------------------- | --------------------- | -------------------------------------------------- |
 | “Thanks! Order #1042 is confirmed. We'll email you when it ships.”               | Accept                | Confirms success and explains the shipping update. |
 | “You're all set. Order #1042 is placed. Watch your inbox for a dispatch notice.” | Accept                | Different wording, same information.               |
-| “Thanks for your patience. Payment for order #1042 is still processing.”         | Reject if it persists | Does not confirm a successful purchase.            |
+| “Thanks for your patience. Payment for order #1042 is still processing.”         | Reject if it persists | Doesn't confirm a successful purchase.             |
 | “Order #1042 confirmed.”                                                         | Reject                | Omits how the customer will hear about shipping.   |
 
-The model judges what the page says. It does not prove that a payment was charged
-or an email was sent. Verify those effects through your application's APIs or test
-doubles when they are part of the test.
+::: warning Pitfall
+The model judges what the page says. It can't prove a payment was charged or an
+email was sent. When those effects are part of the test, verify them through your
+application's APIs or test doubles.
+:::
 
 ## Run the existing checkout test
 
@@ -76,6 +79,6 @@ set `AI_GATEWAY_API_KEY` in `.env` and run:
 EXAMPLE_PROVIDER=ai-sdk node --env-file=.env node_modules/@playwright/test/cli.js test --config=examples/playwright.config.ts checkout.spec.ts --grep "checkout confirms"
 ```
 
-The table above gives calibration cases; the existing test demonstrates the
-successful checkout. Add your own incomplete and contradictory confirmations
-when choosing a threshold.
+The runnable test covers the successful checkout. Use the table above as your
+calibration set, and add your own incomplete and contradictory confirmations when
+you choose a threshold.

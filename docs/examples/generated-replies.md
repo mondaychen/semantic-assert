@@ -5,8 +5,8 @@ description: Test the promises a support bot makes instead of maintaining lists 
 
 # Your test passes. Your bot just promised a refund.
 
-Your support bot must not promise a refund before a review. How do you test that
-when every generated reply can use different words?
+Your support bot must not promise a refund before a human review. How do you test
+that when every generated reply uses different words?
 
 ## Before: maintain forbidden words
 
@@ -17,12 +17,13 @@ const reply = "We'll put the money back on your card.";
 assert.doesNotMatch(reply, /refund/i); // Passes. The promise slips through.
 ```
 
-Add more patterns, and you still have the opposite problem:
-“I can't promise a refund until we've reviewed your case” fails the same check.
+Add more patterns and you get the opposite problem: “I can't promise a refund
+until we've reviewed your case” fails the same check.
 
 ## After: assert the rule
 
-With a configured [core judge](../getting-started):
+With a configured [core judge](../getting-started), state the rule as a negative
+claim:
 
 ```ts
 await judge.expectClaims(
@@ -31,14 +32,19 @@ await judge.expectClaims(
 );
 ```
 
-The model judges whether the reply makes a promise, including paraphrases such
-as “money back”. The claim expresses the requirement without enumerating every
-way to say it. `expected: false` requires evidence that the claim is false;
-it is not simply a failed positive assertion.
+The model judges whether the reply makes a promise, paraphrases like “money back”
+included. The claim says what you require without enumerating every way to say
+it.
+
+::: warning Pitfall
+`expected: false` asks for evidence that the claim is false. That's not the same
+as a positive claim failing. If you need to know a promise is absent, say so.
+:::
 
 ## Check the whole response in one request
 
-Keep exact facts in ordinary assertions, then batch the meaning-based checks:
+Keep exact facts in ordinary assertions, then batch every meaning-based check
+into one call:
 
 ```ts
 import assert from "node:assert/strict";
@@ -66,8 +72,9 @@ await judge.expectClaims(
 ```
 
 All three claims share one captured state and one provider request. The refund
-claim uses a higher threshold. Because this response is fixed, the judge evaluates
-it once instead of retrying the same content.
+claim carries a stricter threshold because it's the one that matters most. The
+response is fixed, so the judge evaluates it once rather than retrying the same
+content.
 
 ## Run the example
 
@@ -79,13 +86,13 @@ pnpm build
 pnpm --filter semantic-assert-examples exec node --test dist/core/generated-response.test.js
 ```
 
-The default fake provider returns scripted scores. To evaluate the content with
-a live model, put `AI_GATEWAY_API_KEY` in `.env` and run:
+The default fake provider returns scripted scores. To evaluate the content with a
+live model, put `AI_GATEWAY_API_KEY` in `.env` and run:
 
 ```sh
 EXAMPLE_PROVIDER=ai-sdk node --env-file=.env --test examples/dist/core/generated-response.test.js
 ```
 
 Read the [complete test](https://github.com/mondaychen/semantic-assert/blob/main/examples/core/generated-response.test.ts)
-for usage metrics and the shared provider setup. Model judgments are probabilistic;
-calibrate with examples of both permitted replies and forbidden promises.
+for usage metrics and the shared provider setup. Model judgments are probabilistic,
+so calibrate with examples of both permitted replies and forbidden promises.

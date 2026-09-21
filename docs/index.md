@@ -6,8 +6,9 @@ description: Assert the meaning of generated responses and HTML pages, with plai
 # Test what your app means.
 
 Copy changes. Generated replies vary. The behavior you need to verify stays the same.
-**semantic-assert** checks plain-English claims about JSON or a captured page,
-with a model as the judge and pass/fail thresholds in your code.
+**semantic-assert** lets you write plain-English claims about JSON or a captured
+page, hands them to a model that acts as the judge, and keeps the pass/fail
+thresholds in your code.
 
 ```ts
 const alert = page.getByRole("alert");
@@ -17,10 +18,10 @@ await judge.expectPageTo("The alert explains how to recover from the error", {
 });
 ```
 
-This uses the [Playwright fixture](./reference/playwright#fixture). For API responses
+That's the [Playwright fixture](./reference/playwright#fixture). For API responses
 and other JSON, use the framework-independent [core judge](./reference/core).
 
-## Start with a familiar testing problem
+## Start with a problem you've probably hit
 
 <div class="example-links">
   <a href="./examples/html-alerts.html">
@@ -39,30 +40,36 @@ and other JSON, use the framework-independent [core judge](./reference/core).
 
 More before-and-after examples:
 
-- [Checkout confirmations](./examples/checkout): “Thanks” appears, but the customer still does not know whether the order succeeded.
+- [Checkout confirmations](./examples/checkout): “Thanks” appears, but the customer still doesn't know whether the order succeeded.
 - [Loading vs. empty states](./examples/search-states): zero rows can mean no results, a pending request, or an error.
-- [Highlighted passages](./examples/highlights): a highlight exists, but it is on the wrong passage.
-- [Answers grounded in a policy](./examples/grounded-answers): the answer contains the right keywords and gives the wrong advice.
+- [Highlighted passages](./examples/highlights): a highlight exists, but it's on the wrong passage.
+- [Answers grounded in a policy](./examples/grounded-answers): the answer has the right keywords and gives the wrong advice.
 
 ## How it works
 
-1. **Capture state.** Return JSON from your application, or capture a page with Playwright.
-2. **Write claims.** Describe the observable behavior. Related claims share one provider request.
-3. **Assert a result.** The judge compares the returned probabilities with your thresholds.
+Every semantic assertion follows the same three steps:
 
-The default judge is [Jev](https://typesafe.ai), TypeSafe's first
-[System One model](https://docs.typesafe.ai/concepts/system-one). It does not
-generate text. It answers yes/no and multiple-choice questions about the supplied
-state with typed results and calibrated probabilities, which is what lets a
-threshold in your code act as a real pass mark. Any `Provider` implementation can
-stand in for it; see [providers](./reference/providers).
+1. **Capture state.** Return JSON from your app, or let the Playwright adapter snapshot a page.
+2. **Write claims.** Describe what a user should be able to tell from that state. Related claims travel in one request.
+3. **Assert the result.** The judge compares the probabilities that come back with your thresholds, and fails the test when a claim doesn't clear its bar.
 
-Assertions evaluate once by default (`timeoutMs: 0`). A Playwright `region` waits
-for its element to attach, up to 5 s, before that single evaluation. Wait for
-visibility or your application's ready state yourself when content settles later.
-For changing state, opt into repeated checks with a positive `timeoutMs`, such as
-`5000`.
-Usage metrics record calls, tokens, and provider wait time.
+### Who's the judge?
+
+By default, [Jev](https://typesafe.ai), TypeSafe's first
+[System One model](https://docs.typesafe.ai/concepts/system-one). Jev doesn't
+generate text. You give it state and a yes/no or multiple-choice question, and it
+returns a typed answer with a calibrated probability. That's what lets a threshold
+in your code act as a real pass mark. Any `Provider` implementation can stand in
+for it; see [providers](./reference/providers).
+
+### One evaluation by default
+
+Assertions evaluate once (`timeoutMs: 0`). A Playwright `region` waits up to 5 s
+for its element to attach before that single evaluation, so locator assertions
+still auto-wait. If content settles later than that, wait for it with Playwright
+first. For state that's genuinely changing, opt into repeated checks with a
+positive `timeoutMs`. Usage metrics record every call, its tokens, and the time
+spent waiting on the provider.
 
 ## Where semantic assertions fit
 
@@ -73,13 +80,12 @@ Usage metrics record calls, tokens, and provider wait time.
 | Whether a response answers the customer's question | Counts, totals, and arithmetic   |
 | Whether a highlighted passage supports a claim     | Exact CSS values and class names |
 
-Model judgments are probabilistic. Calibrate thresholds with both acceptable and
-unacceptable examples from your application. A passing assertion is the model's
-assessment, not proof of correctness.
+::: warning Model judgments are probabilistic
+Calibrate thresholds with both good and bad examples from your own app. A passing
+assertion is the model's assessment, not proof of correctness.
+:::
 
 ## Get started
 
 Follow the [quick start](./getting-started) for a runnable check, then add the
 [Playwright adapter](./reference/playwright) for HTML and browser tests.
-
-Node.js 22 or newer is supported. Packages ship ESM, CommonJS, and TypeScript declarations.

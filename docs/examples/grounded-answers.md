@@ -6,8 +6,8 @@ description: Catch generated answers that repeat the right keywords but contradi
 # The answer says “30 days”. The advice is still wrong.
 
 A customer asks whether they can return opened headphones. Your policy allows
-returns within 30 days only when the headphones are unopened. A generated answer
-can repeat the return window and still get eligibility wrong.
+returns within 30 days, but only if the headphones are unopened. A generated
+answer can quote the return window and still get eligibility wrong.
 
 ## Before: check that the answer mentions the policy
 
@@ -22,13 +22,13 @@ const answer = "Yes, you can return your opened headphones within 30 days.";
 assert.match(answer, /30 days/i); // Passes, despite contradicting the policy.
 ```
 
-Checking for a keyword cannot tell whether the answer applies the rule correctly.
-An exact expected answer has the opposite problem: a correct paraphrase fails.
+A keyword check can't tell whether the answer applies the rule correctly. An exact
+expected answer has the opposite problem: a correct paraphrase fails.
 
-## After: compare the answer with its source and question
+## After: give the judge the source, the question, and the answer
 
-With a configured [core judge](../getting-started), capture the policy, question,
-and answer together:
+With a configured [core judge](../getting-started), capture all three together so
+the model can evaluate the relationship between them:
 
 ```ts
 await judge.expectClaims(
@@ -45,10 +45,9 @@ await judge.expectClaims(
 );
 ```
 
-The intended result for the answer above is a failed assertion. A suitable answer
-would explain that opening the headphones makes them ineligible even within the
-30-day window. The model gets the source text and the customer's situation, so
-it can evaluate the relationship between them.
+For the answer above, the intended result is a failed assertion. A good answer
+would explain that opening the headphones makes them ineligible, even inside the
+30-day window.
 
 ## Catch plausible but unsupported advice
 
@@ -60,20 +59,24 @@ it can evaluate the relationship between them.
 | “Opened headphones are returnable if you pay a restocking fee.”                                  | Reject           | Invents an exception.                                  |
 | “Our return window is 30 days.”                                                                  | Reject           | Leaves the customer's eligibility question unanswered. |
 
-Use these intended outcomes to calibrate a live provider. Do not infer success
-from a fake provider's scripted scores.
+Use these intended outcomes to calibrate a live provider. A fake provider's
+scripted scores can't tell you anything about the answers themselves.
 
 ## Use it in a retrieval or agent test
 
-Replace `policy` with the source text supplied to your model, `question` with the
-test customer's request, and `answer` with the generated response. Keep the source
-in captured state; checking only the answer would leave the judge without the
-evidence it needs.
+Replace `policy` with the source text your model was given, `question` with the
+test customer's request, and `answer` with the generated response.
 
-This evaluates consistency with the supplied source, not whether the source is
-current or factually correct. It also does not prove that retrieval found every
+::: warning Pitfall
+Keep the source in the captured state. If you capture only the answer, the judge
+has nothing to check it against, and “correctly applies the policy” becomes a
+guess.
+:::
+
+This checks consistency with the supplied source, not whether the source is
+current or factually correct, and it doesn't prove that retrieval found every
 relevant document. Test retrieval coverage and exact document IDs separately.
 
 The same pattern works for generated summaries: capture the source alongside the
-summary, then assert the important facts that must be preserved. Use code for
-exact prices, dates, counts, and other values that can be checked deterministically.
+summary, then assert the facts that must survive. Leave exact prices, dates,
+counts, and other deterministic values to code.

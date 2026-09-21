@@ -5,11 +5,24 @@ description: Capture JSON, batch claims, configure thresholds and polling, and i
 
 # Core assertions
 
-`semantic-assert` is independent of browsers, test runners, and model vendors.
-The core has no runtime dependencies. A provider evaluates questions; the judge
-handles thresholds, polling, and metrics.
+The `semantic-assert` package is the judge itself. It knows nothing about browsers,
+test runners, or model vendors, and it has no runtime dependencies. You give it a
+provider that answers questions, and it handles thresholds, polling, and metrics.
+
+::: info You will learn
+
+- How to create a judge and assert claims about JSON
+- How negative claims and per-claim thresholds work
+- How to write claims the model can judge well
+- When and how to poll changing state
+- How to classify state into named options
+- What a failure gives you to work with
+
+:::
 
 ## Create a judge
+
+Pair a provider with settings:
 
 ```ts
 import { Judge, resolveJudgeSettings } from "semantic-assert";
@@ -21,10 +34,13 @@ const judge = new Judge({
 });
 ```
 
+`resolveJudgeSettings` layers your overrides over environment variables and
+built-in defaults. The full list is in [providers and configuration](./providers#judge-settings).
+
 ## Assert claims
 
-The capture callback returns JSON. All claims in one invocation share the same
-captured state and provider request.
+Call `expectClaims` with a function that returns the state to judge and a list of
+claims about it:
 
 ```ts
 await judge.expectClaims(
@@ -36,30 +52,41 @@ await judge.expectClaims(
 );
 ```
 
-The default is one evaluation (`timeoutMs: 0`). The call resolves when every claim
-passes, and throws `SemanticAssertionError` otherwise. A positive timeout opts into
-repeated captures and evaluations until all claims pass or polling ends.
+Every claim in one call shares the same captured state and the same provider
+request, so batching related claims costs no more than asking one. The call
+resolves when every claim passes and throws `SemanticAssertionError` otherwise.
+
+By default that's a single evaluation (`timeoutMs: 0`). A positive timeout opts
+into repeated captures and evaluations until every claim passes or time runs out.
 
 ### Negative claims
+
+Set `expected: false` when the claim describes something that must not be true:
 
 ```ts
 { claim: "The reply promises a refund", expected: false, threshold: 0.9 }
 ```
 
-At a threshold of `0.9`, a positive claim needs a returned probability of at least
-`0.9`. A negative claim needs a probability of at most `1 - 0.9` (`0.1`). A low score
-on a positive claim is not automatically strong evidence for its opposite.
+At a threshold of `0.9`, a positive claim needs a probability of at least `0.9`.
+A negative claim needs a probability of at most `1 - 0.9`, so `0.1`.
 
-### Write observable claims
+::: warning Pitfall
+A low score on a positive claim isn't strong evidence for its opposite. If you
+need the model to confirm that something is absent, write that as a negative
+claim rather than reading a failed positive claim backwards.
+:::
 
-- Name the relevant subject: “The alert asks the user to try again.”
-- Keep one condition per claim so failures identify the missing behavior.
-- Include relevant context in captured state, such as the customer's question.
-- Use ordinary assertions for exact strings, IDs, counts, and arithmetic.
+### Write claims the model can judge
+
+- **Name the subject.** “The alert asks the user to try again” beats “it asks to try again.”
+- **One condition per claim.** When a claim fails, you'll know exactly which behavior is missing.
+- **Put the context in the state.** If a claim refers to the customer's question, capture the question alongside the reply.
+- **Leave exact facts to code.** Strings, IDs, counts, and arithmetic belong in ordinary assertions.
 
 ## Poll changing state
 
-Capture inside the callback so each poll sees current state:
+Capture inside the callback so each poll sees the current state, and set a
+positive `timeoutMs`:
 
 ```ts
 await judge.expectClaims(
@@ -72,22 +99,31 @@ await judge.expectClaims(
 );
 ```
 
-With polling enabled, throw `NotReadyError` from the callback when the state cannot
-be captured yet and the judge should try again. At the default zero timeout, that
-error is thrown to the caller without a model call.
+The judge recaptures and re-evaluates until every claim passes or the deadline
+arrives. Each poll is one provider request.
 
-The callback receives a context object. While polling, its `pollingDeadline` is the
-epoch time when polling stops, so a capture that waits for its own target can cap
-that wait. The Playwright adapter uses it for its region wait.
+When the state can't be captured yet, throw `NotReadyError` from the callback.
+With polling on, the judge waits and tries again. At the default zero timeout,
+the error goes straight to you without a model call.
 
-`timeoutMs` bounds polling, not an individual provider request. An in-flight
-request can finish after the polling deadline. Set the provider's request timeout
-and retries, and give your test runner enough time for both.
+::: details Deep dive: the capture context
+Your callback receives a context object. While polling, its `pollingDeadline` is
+the epoch time when polling stops. A capture that waits for its own target, such
+as a locator, can cap that wait so it never outlasts the assertion. The Playwright
+adapter uses this for its region wait.
+:::
+
+::: warning Pitfall
+`timeoutMs` bounds polling, not a single provider request. A request already in
+flight finishes under the provider's own timeout and retry settings, so it can
+complete after the polling deadline. Configure the provider's request timeout and
+retries, and give your test runner room for both.
+:::
 
 ## Classify state
 
-`classify` chooses among named options and evaluates once by default. When you
-also set a positive `timeoutMs`, `settled` lists the options that end polling:
+Use `classify` when the question is “which of these is it?” rather than “is this
+true?”:
 
 ```ts
 const result = await judge.classify(
@@ -102,25 +138,43 @@ const result = await judge.classify(
 );
 ```
 
-At the default zero timeout, `classify` returns its first answer even if its choice
-is not settled. With polling enabled, it returns the last answer on timeout.
-Assert `result.choice` and any confidence requirement in your own code.
+`classify` evaluates once by default and returns the chosen option with its
+confidence. With a positive `timeoutMs`, `settled` lists the options that end
+polling: the judge keeps recapturing while the answer is `loading`, and stops as
+soon as it sees `empty` or `listed`.
+
+::: warning Pitfall
+`classify` never fails a test on its own. At the default zero timeout it returns
+its first answer even if that answer isn't settled, and with polling it returns
+the last answer on timeout. Always assert `result.choice` and any confidence
+requirement yourself.
+:::
 
 ## Failure evidence and usage
 
-`SemanticAssertionError.results` contains the claims, expectations, probabilities,
-thresholds, and pass/fail decisions. An optional `hooks.attach` function on the
-judge receives evidence for your test report. The Playwright fixture wires this
-up automatically.
+When a claim misses, `SemanticAssertionError.results` lists every claim with its
+expectation, probability, threshold, and pass/fail decision. Pass a `hooks.attach`
+function when you create the judge to receive that evidence for your test report.
+The Playwright fixture wires this up for you.
+
+Read usage at any time:
 
 ```ts
 console.log(judge.metrics.totals);
 ```
 
-Metrics include calls, questions, input/output tokens, and provider wait time.
-Cost is an estimate from rates configured on the provider; it is unknown until
-those rates are set.
+Metrics include calls, questions, input and output tokens, and time spent waiting
+on the provider. Cost is an estimate from rates you configure on the provider,
+and stays unknown until you set them.
 
-See the [source reference](https://github.com/mondaychen/semantic-assert/tree/main/packages/semantic-assert)
-for the provider interface and `evaluate`, which returns answers without enforcing
-an acceptance policy.
+## Recap
+
+- `expectClaims` batches claims about one captured state into one request and throws when a claim misses.
+- Negative claims need `expected: false`; a failed positive claim isn't the same thing.
+- Polling is opt-in with a positive `timeoutMs`. Throw `NotReadyError` when there's nothing to judge yet.
+- `classify` returns an answer; you decide whether it's the right one.
+- Failures carry per-claim results, and metrics track what each judgment cost.
+
+For the provider interface and `evaluate`, which returns raw answers without an
+acceptance policy, see the
+[source reference](https://github.com/mondaychen/semantic-assert/tree/main/packages/semantic-assert).

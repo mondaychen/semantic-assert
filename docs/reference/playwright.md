@@ -5,8 +5,20 @@ description: Set up the Playwright judge fixture, scope page captures, redact se
 
 # Playwright
 
-The adapter captures an accessibility snapshot, URL, and title. Claims are judged
-against that captured text, rather than the raw HTML source or a screenshot.
+The adapter captures what a screen reader would see: the accessibility snapshot,
+the URL, and the title. Your claims are judged against that text, not the raw HTML
+or a screenshot, which keeps judgments anchored to what a user can actually tell.
+
+::: info You will learn
+
+- How to add the `judge` fixture to your tests
+- Why the judge evaluates once, and when to wait or poll
+- How to scope a capture to one region
+- How to use the `expect` matchers
+- How to redact data before it leaves the browser
+- How to test visual styling and read the evidence report
+
+:::
 
 ## Install
 
@@ -16,11 +28,11 @@ pnpm exec playwright install chromium
 export TYPESAFE_API_KEY="your-api-key"
 ```
 
-The adapter requires `@playwright/test >=1.50.0` and Node.js 22 or newer.
+The adapter needs `@playwright/test >=1.50.0` and Node.js 22 or newer.
 
 ## Fixture
 
-Create `fixtures.ts`:
+Extend Playwright's `test` with the judge fixtures in a `fixtures.ts`:
 
 ```ts
 import { test as base } from "@playwright/test";
@@ -40,10 +52,14 @@ test.use({ judgeOptions: { threshold: 0.8 } });
 export { expect } from "@playwright/test";
 ```
 
-The provider object belongs in the fixture definition. Do not place it in the
-Playwright config's `use` block, which is serialized to workers.
+::: warning Pitfall
+The provider object belongs where `test` is built, as above. Don't put it in the
+Playwright config's `use` block. That block is serialized to workers, and a
+provider instance doesn't survive the trip. `judgeOptions` is plain data and can
+live anywhere.
+:::
 
-Use it in `alert.spec.ts`:
+Then use `judge` like any other fixture, here in `alert.spec.ts`:
 
 ```ts
 import { test, expect } from "./fixtures";
@@ -61,13 +77,13 @@ test("an alert explains how to recover", async ({ page, judge }) => {
 });
 ```
 
-Run with `pnpm exec playwright test`. Replace `page.setContent` with navigation and
-interactions for an application test.
+Run it with `pnpm exec playwright test`. In a real test, replace `page.setContent`
+with navigation and interactions.
 
 ## Wait first, then judge once
 
-Semantic assertions evaluate once by default (`timeoutMs: 0`). Let Playwright
-wait for the target before asking the model about its meaning:
+Semantic assertions evaluate once by default (`timeoutMs: 0`). Let Playwright do
+the waiting, then ask the model about meaning:
 
 ```ts
 const alert = page.getByRole("alert");
@@ -75,17 +91,21 @@ await alert.waitFor({ state: "visible" });
 await judge.expectPageTo("The alert explains how to recover", { region: alert });
 ```
 
-`await expect(alert).toBeVisible()` also waits and asserts visibility. If the
-element appears before its final content arrives, wait for your application's
+`await expect(alert).toBeVisible()` waits and asserts visibility in one line. If
+the element appears before its final content does, wait for your application's
 ready state as well.
 
-A `region` capture waits for its element on its own, up to `regionTimeoutMs`
-(default 5 s, the same as Playwright's `expect` timeout). That wait happens in the
-browser and sends nothing to the model, so it is separate from `timeoutMs`. Set it
-per call or for the suite in `judgeOptions`; a region that never appears fails
-with `RegionNotFoundError`.
+### Regions wait on their own
 
-For content you want the judge to keep checking, opt into polling:
+A `region` capture waits for its element to attach, up to `regionTimeoutMs`.
+The default is 5 s, the same as Playwright's `expect` timeout. That wait happens
+in the browser and sends nothing to the model, so it's separate from `timeoutMs`.
+Set it per call or for the whole suite in `judgeOptions`. A region that never
+appears fails with `RegionNotFoundError`.
+
+### Opt into polling
+
+For content you want the judge to keep checking, set a positive `timeoutMs`:
 
 ```ts
 await judge.expectPageTo("The export is ready to download", {
@@ -95,13 +115,12 @@ await judge.expectPageTo("The export is ready to download", {
 });
 ```
 
-This recaptures the target between evaluations and stops as soon as the claim
-passes. Provider request timeouts and retries are configured separately.
+The judge recaptures the region between evaluations and stops as soon as the
+claim passes. Provider request timeouts and retries are configured separately.
 
 ## Scope the capture
 
-Pass a `region` locator or CSS selector to capture just the relevant content.
-This also reduces the text sent to the model.
+Pass a `region` locator or CSS selector to capture only the relevant content:
 
 ```ts
 await judge.expectPageTo("The message confirms that the purchase succeeded", {
@@ -109,12 +128,16 @@ await judge.expectPageTo("The message confirms that the purchase succeeded", {
 });
 ```
 
-Use `expectPage` to batch multiple claims. Use `expectPageNotTo` for one negative
-claim. Both support per-call thresholds, polling options, and `regionTimeoutMs`.
+Scoping does two jobs. It shrinks the text sent to the model, and it stops
+unrelated page content from filling in information the region itself is missing.
+
+Use `expectPage` to batch several claims into one request, and `expectPageNotTo`
+for a single negative claim. Both accept per-call thresholds, polling options,
+and `regionTimeoutMs`.
 
 ## Matcher syntax
 
-If you prefer assertions on locators, create a judge-aware `expect`:
+If you'd rather assert on locators directly, create a judge-aware `expect`:
 
 ```ts
 import { createJudgeExpect } from "semantic-assert-playwright";
@@ -130,14 +153,19 @@ await expect(page.getByTestId("agent-panel")).toSatisfyAll([
 ]);
 ```
 
-Like built-in locator matchers, these wait for the locator to attach, up to
-`regionTimeoutMs`, and then evaluate once. They reject `.not`. Use `expected: false`
-to require evidence for a negative claim.
+Like Playwright's built-in locator matchers, these wait for the locator to attach,
+up to `regionTimeoutMs`, and then evaluate once.
+
+::: warning Pitfall
+These matchers reject `.not`. A claim that misses its threshold isn't evidence of
+the opposite. Use `{ claim, expected: false }` to require evidence for a negative
+claim instead.
+:::
 
 ## Redact sensitive data
 
-Captured state is sent to the configured provider. The `redact` hook runs before
-that request:
+Everything you capture is sent to the configured provider. Use the `redact` hook
+to change the state right before that request:
 
 ```ts
 await judge.expectPageTo("The error gives the user a recovery step", {
@@ -149,12 +177,13 @@ await judge.expectPageTo("The error gives the user a recovery step", {
 });
 ```
 
-This example removes one known email. Review URL, title, links, visual hints, and
-extra state as well when your captures contain sensitive information.
+This example removes one known email from the snapshot. When your captures carry
+sensitive information, review the URL, title, links, visual hints, and extra state
+too.
 
 ## Visual hints
 
-An accessibility snapshot does not describe styling. Enable `visualHints` for
+An accessibility snapshot says nothing about styling. Turn on `visualHints` for
 claims about highlights, bold text, strikethrough, or text color:
 
 ```ts
@@ -164,13 +193,15 @@ await judge.expectPageTo("A passage has a highlighted background", {
 });
 ```
 
-Hints are text observations gathered from the page, not screenshot analysis.
-They are off by default. Use `toHaveCSS` or `toHaveClass` for exact style checks.
+Hints are text observations gathered from the page, not screenshot analysis, and
+they're off by default because they cost an extra evaluation and tokens. For
+exact style checks, stay with `toHaveCSS` or `toHaveClass`.
 
 ## Evidence and reporting
 
-The fixture attaches judgment evidence to Playwright reports, including captured
-state when claims fail. Add the usage reporter to `playwright.config.ts`:
+The fixture attaches judgment evidence to Playwright's report, including the
+captured state when a claim fails. Add the usage reporter to
+`playwright.config.ts` to collect spend across the run:
 
 ```ts
 import { defineConfig } from "@playwright/test";
@@ -186,5 +217,13 @@ export default defineConfig({
 });
 ```
 
-The report includes calls, tokens, provider wait, and estimated cost when you
+The report lists calls, tokens, provider wait time, and estimated cost once you
 configure provider rates. See [providers](./providers) for those settings.
+
+## Recap
+
+- Add `judgeFixtures` to your `test`, and give the provider where `test` is built.
+- Let Playwright wait, then judge once. Regions wait up to `regionTimeoutMs` on their own.
+- Scope captures with `region`. It saves tokens and keeps the model honest.
+- Matchers auto-wait like the built-ins and reject `.not`.
+- Redact before the request, turn on `visualHints` only for styling claims, and add the reporter to see what a run cost.
