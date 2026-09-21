@@ -5,10 +5,15 @@ description: Assert the meaning of generated responses and HTML pages, with plai
 
 # Test what your app means.
 
-Copy changes. Generated replies vary. The behavior you need to verify stays the same.
-**semantic-assert** lets you write plain-English claims about JSON or a captured
-page, hands them to a model that acts as the judge, and keeps the pass/fail
-thresholds in your code.
+<ExpandableImage
+  src="/comic-exact-match.webp"
+  alt="A four-panel comic titled Exact Match. A developer writes a test that checks an alert's exact text, thinking it will break the second anyone touches the copy. Two weeks later a PM makes the error message friendlier and the test fails. The developer pastes in the new string. A week later the PM changes the copy back and asks whether the test broke again. The developer says no, they found a better way to do testing, and the screen shows a passing assertion that reads: the alert tells the user how to recover."
+/>
+
+**semantic-assert** lets you assert the requirement instead. Write the claim the
+way the PRD states it, hand it to a model that acts as the judge, and keep the
+pass/fail threshold in your code. Thanks to latest AI, it's fast, cheap, and
+reliable.
 
 ```ts
 const alert = page.getByRole("alert");
@@ -25,25 +30,24 @@ and other JSON, use the framework-independent [core judge](./reference/core).
 
 <div class="example-links">
   <a href="./examples/html-alerts.html">
-    <strong>Your PM changed the copy. Why is CI red? →</strong>
+    <strong>Your PM changed the copy... and yeah the CI turned red. →</strong>
     <span>Check that an alert explains the failure and recovery step across copy edits.</span>
   </a>
   <a href="./examples/generated-replies.html">
-    <strong>Your test passes. Your bot just promised a refund. →</strong>
+    <strong>The bot just promised a refund? How did the CI pass? →</strong>
     <span>Catch a forbidden promise even when the reply never uses the word “refund”.</span>
   </a>
   <a href="./examples/page-coherence.html">
     <strong>The route changed. The tab title didn't. →</strong>
-    <span>Check that the title, navigation, and main content agree after a client-side navigation.</span>
+    <span>Check that the title, breadcrumb, and heading agree, even when the page is named by whatever the user typed.</span>
   </a>
 </div>
 
-More before-and-after examples:
+Or one of these:
 
-- [Checkout confirmations](./examples/checkout): “Thanks” appears, but the customer still doesn't know whether the order succeeded.
-- [Loading vs. empty states](./examples/search-states): zero rows can mean no results, a pending request, or an error.
-- [Highlighted passages](./examples/highlights): a highlight exists, but it's on the wrong passage.
-- [Answers grounded in a policy](./examples/grounded-answers): the answer has the right keywords and gives the wrong advice.
+- [Zero results. Or just not loaded yet?](./examples/search-states) Zero rows can mean no results, a request still in flight, or an error.
+- [A passage is highlighted... in the wrong place.](./examples/highlights) The styling is there. It's attached to the wrong text.
+- [The answer says “30 days”. The advice is still wrong.](./examples/grounded-answers) The right keywords, the wrong conclusion.
 
 ## How it works
 

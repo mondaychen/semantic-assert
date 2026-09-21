@@ -2,9 +2,10 @@
 
 Assert plain-English claims about captured state, with a model as the judge.
 
-Copy changes. Generated replies vary. The behavior you need to verify stays the
-same. `semantic-assert` lets you write the claim once, hands it to a model that
-returns a calibrated probability, and keeps the pass/fail threshold in your code.
+Every exact-string assertion is a bet that nobody will touch the copy.
+`semantic-assert` lets you assert what the PRD actually asks for, such as "the
+alert tells the user how to recover", with a model as the judge and the pass/fail
+threshold in your code.
 
 ```ts
 const alert = page.getByRole("alert");

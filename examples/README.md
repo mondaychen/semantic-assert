@@ -31,7 +31,7 @@ Fake token counts are sample values, and cost is unknown.
 | [Failure evidence](core/failure-evidence.test.ts)               | Catch `SemanticAssertionError`, inspect probabilities, and attach judged state                  |
 | [Checkout and error messages](playwright/checkout.spec.ts)      | Extend Playwright fixtures, interact with a page, batch claims, scope capture, and redact data  |
 | [Alert copy changes](playwright/alert-copy.spec.ts)             | Accept two wordings of an HTML alert and reject missing recovery guidance in a scoped region    |
-| [Page coherence](playwright/page-coherence.spec.ts)             | Check that title, nav, and main content agree after navigation, with `extraState` for the nav   |
+| [Page coherence](playwright/page-coherence.spec.ts)             | Check that title, breadcrumb, and heading agree on a page named by user input, via `extraState` |
 | [Search page classification](playwright/classification.spec.ts) | Distinguish loading, results, empty, and error states                                           |
 | [Document styling](playwright/visual-matchers.spec.ts)          | Locator matchers, negative claims, and visual hints for highlights and struck-through text      |
 

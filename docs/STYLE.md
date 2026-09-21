@@ -97,7 +97,11 @@ Several pages repeat the same facts. Keep them consistent, and update every page
 
 GitHub renders no callouts, so the root `README.md` uses the Tailwind side of this
 guide only: pitch, code sample first, a "why" section, a "what you get" list, then
-packages, install, development, releases, license. Keep the development details
+packages, install, development, releases, license. The README's opening paragraph
+and the landing page's hook make the same point in different lengths: developers
+write exact-string assertions knowing a copy or layout change will break them, and
+this library lets them assert the requirement from the PRD instead. Change one and
+revisit the other. Keep the development details
 complete. That section is for contributors, not marketing.
 
 ## Checklist before you publish
