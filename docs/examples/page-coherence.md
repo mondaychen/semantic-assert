@@ -3,7 +3,9 @@ title: Page coherence after navigation
 description: Check that the document title, breadcrumb, and heading of a page all describe the same thing, even when that thing is named by user input.
 ---
 
-# The route changed. The tab title didn't.
+# Page coherence after navigation
+
+<p class="page-hook">The route changed but the tab title didn't... and every test stayed green.</p>
 
 A user creates a project and names it whatever they like. Your app navigates to
 the new project's page and derives the title, the breadcrumb, and the heading from

@@ -3,7 +3,9 @@ title: Highlighted passages
 description: Check that the relevant passage is highlighted and obsolete guidance is struck through, rather than only finding a styled element.
 ---
 
-# A passage is highlighted. It's the wrong one.
+# Highlighted passages
+
+<p class="page-hook">A passage is highlighted... in the wrong place.</p>
 
 Your document viewer highlights a cited policy passage and strikes through
 obsolete guidance. A style check passes even when the decoration landed on

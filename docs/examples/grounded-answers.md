@@ -3,7 +3,9 @@ title: Answers grounded in a policy
 description: Catch generated answers that repeat the right keywords but contradict the policy provided to them.
 ---
 
-# The answer says “30 days”. The advice is still wrong.
+# Answers grounded in a policy
+
+<p class="page-hook">The answer says “30 days”... yet the advice is still wrong.</p>
 
 A customer asks whether they can return opened headphones. Your policy allows
 returns within 30 days, but only if the headphones are unopened. A generated

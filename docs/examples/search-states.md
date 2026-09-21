@@ -3,7 +3,9 @@ title: Loading vs. empty states
 description: Distinguish a useful empty search state from loading or failure instead of treating zero rows as success.
 ---
 
-# Zero results. Or just not loaded yet?
+# Loading vs. empty states
+
+<p class="page-hook">Zero results... or did it just not load yet?</p>
 
 A new account has no projects. Your test checks for zero rows and passes while the
 search is still loading. The same assertion passes after an error, too.

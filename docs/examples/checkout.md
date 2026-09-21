@@ -3,7 +3,9 @@ title: Checkout confirmations
 description: Go beyond a thank-you message to check that checkout confirms the purchase and explains what happens next.
 ---
 
-# “Thanks” is visible. Did the order succeed?
+# Checkout confirmations
+
+<p class="page-hook">The page says “Thanks”... but did the order actually go through?</p>
 
 Your checkout test clicks the button and finds a thank-you message. It passes even
 when the page never confirms the purchase or tells the customer what happens next.

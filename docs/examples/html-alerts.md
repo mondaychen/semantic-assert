@@ -3,7 +3,9 @@ title: HTML alerts & copy changes
 description: Replace brittle exact-text checks with semantic assertions that accept copy edits and catch missing recovery guidance.
 ---
 
-# Your PM changed the copy. Why is CI red?
+# HTML alerts & copy changes
+
+<p class="page-hook">Your PM changed the copy... and yeah the CI turned red.</p>
 
 Your alert still explains the same problem and the same recovery step. Only the
 wording changed.

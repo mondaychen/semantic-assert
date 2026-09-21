@@ -61,6 +61,15 @@ html {
   letter-spacing: -0.025em;
 }
 
+/* The conversational hook under an example page's title. */
+.vp-doc .page-hook {
+  margin: 4px 0 28px;
+  max-width: 680px;
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--vp-c-text-2);
+}
+
 .vp-doc p,
 .vp-doc li {
   line-height: 1.8;

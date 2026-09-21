@@ -3,7 +3,9 @@ title: BDD scenarios with playwright-bdd
 description: Turn Gherkin steps into semantic claims with playwright-bdd, so the feature file states the requirement and the step definition stops checking strings.
 ---
 
-# Your Gherkin reads like the PRD. Your steps check a string.
+# BDD scenarios with playwright-bdd
+
+<p class="page-hook">Your Gherkin reads like the PRD... but your steps just check a string.</p>
 
 Behavior-driven development promised scenarios a PM could read and sign off. Then
 the step definitions arrived, and the only way to make a step pass was to put the

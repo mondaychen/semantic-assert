@@ -54,13 +54,14 @@ Borrow React's page furniture.
 
 **Example pages** (`examples/*.md`) follow a fixed shape:
 
-1. An `h1` that states the problem the way a developer would say it out loud. "Your PM changed the copy. Why is CI red?" Keep it under ten words when you can.
-2. One or two sentences framing the problem, optionally with the HTML or data in question.
-3. `## Before: ...` with the brittle assertion and one paragraph on how it fails.
-4. `## After: ...` with the semantic assertion and one paragraph on what changed.
-5. A table of intended outcomes with an Accept or Reject column. Include at least one Reject row; a calibration set that only has good examples is useless.
-6. `## Run the ...` with the fake-provider command first, then the live command.
-7. `## Use your application's page` or an equivalent "adapt this" section.
+1. An `h1` with the page's formal title, the same text as the frontmatter `title` and the sidebar entry. "HTML alerts & copy changes."
+2. Directly under it, a hook in `<p class="page-hook">`: the problem the way a developer would say it out loud, in one sentence that trails off and lands with an ellipsis. "Your PM changed the copy... and yeah the CI turned red." "Zero results... or did it just not load yet?" A landing-page card or list entry reuses the hook word for word.
+3. One or two sentences framing the problem, optionally with the HTML or data in question.
+4. `## Before: ...` with the brittle assertion and one paragraph on how it fails.
+5. `## After: ...` with the semantic assertion and one paragraph on what changed.
+6. A table of intended outcomes with an Accept or Reject column. Include at least one Reject row; a calibration set that only has good examples is useless.
+7. `## Run the ...` with the fake-provider command first, then the live command.
+8. `## Use your application's page` or an equivalent "adapt this" section.
 
 ## Callouts
 

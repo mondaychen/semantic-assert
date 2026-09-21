@@ -38,16 +38,16 @@ and other JSON, use the framework-independent [core judge](./reference/core).
     <span>Catch a forbidden promise even when the reply never uses the word “refund”.</span>
   </a>
   <a href="./examples/page-coherence.html">
-    <strong>The route changed. The tab title didn't. →</strong>
+    <strong>The route changed but the tab title didn't... and every test stayed green. →</strong>
     <span>Check that the title, breadcrumb, and heading agree, even when the page is named by whatever the user typed.</span>
   </a>
 </div>
 
 Or one of these:
 
-- [Zero results. Or just not loaded yet?](./examples/search-states) Zero rows can mean no results, a request still in flight, or an error.
+- [Zero results... or did it just not load yet?](./examples/search-states) Zero rows can mean no results, a request still in flight, or an error.
 - [A passage is highlighted... in the wrong place.](./examples/highlights) The styling is there. It's attached to the wrong text.
-- [The answer says “30 days”. The advice is still wrong.](./examples/grounded-answers) The right keywords, the wrong conclusion.
+- [The answer says “30 days”... yet the advice is still wrong.](./examples/grounded-answers) The right keywords, the wrong conclusion.
 
 ## How it works
 

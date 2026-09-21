@@ -3,7 +3,9 @@ title: Generated support replies
 description: Test the promises a support bot makes instead of maintaining lists of forbidden words.
 ---
 
-# Your test passes. Your bot just promised a refund.
+# Generated support replies
+
+<p class="page-hook">The bot just promised a refund? How did the CI pass?</p>
 
 Your support bot must not promise a refund before a human review. How do you test
 that when every generated reply uses different words?
