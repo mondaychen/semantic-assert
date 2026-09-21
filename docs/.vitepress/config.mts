@@ -5,15 +5,15 @@ export default defineConfig({
   description:
     "Test what your app means. Semantic assertions for JSON, generated responses, and Playwright pages.",
   lang: "en-US",
-  base: "/",
+  base: "/semantic-assert/",
   // Contributor notes, not site pages.
   srcExclude: ["STYLE.md", "CLAUDE.md"],
   appearance: false,
   lastUpdated: false,
-  sitemap: { hostname: "https://semantic-assert.js.org/" },
+  sitemap: { hostname: "https://mengdi.dev/semantic-assert/" },
   head: [
     ["meta", { name: "theme-color", content: "#42b983" }],
-    ["link", { rel: "icon", type: "image/svg+xml", href: "/logo.svg" }],
+    ["link", { rel: "icon", type: "image/svg+xml", href: "/semantic-assert/logo.svg" }],
   ],
   themeConfig: {
     logo: "/logo.svg",
