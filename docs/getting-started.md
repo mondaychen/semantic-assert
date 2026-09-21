@@ -1,6 +1,6 @@
 ---
 title: Quick start
-description: Run your first semantic assertion with TypeSafe, AI Gateway, or a scripted provider without an API key.
+description: Run your first semantic assertion with TypeSafe, Vercel AI Gateway, or a scripted provider without an API key.
 ---
 
 # Quick start
@@ -13,7 +13,7 @@ continue with the [Playwright setup](./reference/playwright#install) afterwards.
 
 - How to install the core package and a provider
 - How to assert a plain-English claim about a JSON value
-- How to switch to AI Gateway
+- How to switch to Vercel AI Gateway
 - How to run the whole flow without an API key
 
 :::
@@ -78,7 +78,7 @@ question about the same response again costs a request and adds no evidence. Set
 positive timeout only when the state you capture actually changes between checks,
 and you want the judge to recapture it and try again.
 
-## Use AI Gateway
+## Use Vercel AI Gateway
 
 Install the adapter and its AI SDK peer dependency:
 
@@ -99,7 +99,7 @@ const judge = new Judge({
 ```
 
 This adapter defaults to `typesafe-ai/jev`, so you're still using Jev, routed
-through Vercel's gateway. See [providers](./reference/providers) for timeout,
+through [Vercel AI Gateway](https://vercel.com/ai-gateway). See [providers](./reference/providers) for timeout,
 retry, and cost settings.
 
 ## Try the flow without an API key

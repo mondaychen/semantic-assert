@@ -1,6 +1,6 @@
 ---
 title: Providers & configuration
-description: Choose TypeSafe, AI Gateway, or a fake provider and configure thresholds, timeouts, retries, and usage estimates.
+description: Choose TypeSafe, Vercel AI Gateway, or a fake provider and configure thresholds, timeouts, retries, and usage estimates.
 ---
 
 # Providers & configuration
@@ -9,17 +9,17 @@ The judge and the Playwright adapter accept anything that implements the
 `Provider` interface. Two providers ship with the project, plus a fake for testing
 the flow itself.
 
-| Package                      | Role                                                             |
-| ---------------------------- | ---------------------------------------------------------------- |
-| `semantic-assert`            | Core judge, settings, metrics, and scripted `FakeProvider`       |
-| `semantic-assert-typesafe`   | TypeSafe Jev provider                                            |
-| `semantic-assert-ai-sdk`     | AI SDK evaluation provider, defaulting to Jev through AI Gateway |
-| `semantic-assert-playwright` | Page capture, fixtures, matchers, and reporting                  |
+| Package                      | Role                                                                    |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| `semantic-assert`            | Core judge, settings, metrics, and scripted `FakeProvider`              |
+| `semantic-assert-typesafe`   | TypeSafe Jev provider                                                   |
+| `semantic-assert-ai-sdk`     | AI SDK evaluation provider, defaulting to Jev through Vercel AI Gateway |
+| `semantic-assert-playwright` | Page capture, fixtures, matchers, and reporting                         |
 
 ::: info You will learn
 
 - What Jev is and how claims map onto its questions
-- How to configure the TypeSafe and AI Gateway providers
+- How to configure the TypeSafe and Vercel AI Gateway providers
 - How to script a fake provider
 - Which judge settings exist and where their defaults come from
 - Why you should calibrate thresholds before trusting them
@@ -57,9 +57,9 @@ they don't nest with SDK retries.
 To estimate cost, set `usdPerMtokInput` or `TYPESAFE_USD_PER_MTOK_INPUT` to your
 current rate. Until you do, cost reports as unknown.
 
-## AI Gateway
+## Vercel AI Gateway
 
-Use the AI SDK adapter to reach Jev through Vercel's AI Gateway:
+Use the AI SDK adapter to reach Jev through [Vercel AI Gateway](https://vercel.com/ai-gateway):
 
 ```ts
 import { aiSdk } from "semantic-assert-ai-sdk";
@@ -147,7 +147,7 @@ Recheck any confidence threshold when you switch between them.
 
 ## Recap
 
-- Jev is the default judge, reached directly through TypeSafe or through AI Gateway.
+- Jev is the default judge, reached directly through TypeSafe or through Vercel AI Gateway.
 - The two providers handle retries differently. Set timeouts with that in mind.
 - `FakeProvider` scripts scores and records requests for tests of the flow.
 - Settings resolve from overrides, then environment, then defaults.

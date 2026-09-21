@@ -35,7 +35,7 @@ right, not a number quoted inside prose. Jev is newer than the chat models most
 test suites reach for, and it's built for exactly this kind of judgment.
 
 You're not locked in. Anything that implements the `Provider` interface works,
-and the Vercel AI SDK adapter reaches Jev through AI Gateway.
+and the Vercel AI SDK adapter reaches Jev through [Vercel AI Gateway](https://vercel.com/ai-gateway).
 
 ## What you get
 
@@ -51,7 +51,7 @@ and the Vercel AI SDK adapter reaches Jev through AI Gateway.
 | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | [semantic-assert](packages/semantic-assert)                       | Provider interface, polling judge, settings, metrics, and deterministic fake provider; no runtime dependencies |
 | [semantic-assert-typesafe](packages/semantic-assert-typesafe)     | TypeSafe Jev provider                                                                                          |
-| [semantic-assert-ai-sdk](packages/semantic-assert-ai-sdk)         | Vercel AI SDK evaluation provider, with Jev through AI Gateway                                                 |
+| [semantic-assert-ai-sdk](packages/semantic-assert-ai-sdk)         | Vercel AI SDK evaluation provider, with Jev through Vercel AI Gateway                                          |
 | [semantic-assert-playwright](packages/semantic-assert-playwright) | Page capture, visual hints, fixtures, matchers, and usage reporter                                             |
 
 Every package ships ESM, CommonJS, and TypeScript declarations, and you can install
@@ -96,10 +96,10 @@ TypeScript resolution. It uses the installed tool versions, prefers the pnpm
 cache, and leaves the temporary artifacts in place for inspection.
 
 The browser smoke test uses a local page and needs no credentials. A second smoke
-test runs against TypeSafe only when `TYPESAFE_API_KEY` is set, and the AI Gateway
+test runs against TypeSafe only when `TYPESAFE_API_KEY` is set, and the Vercel AI Gateway
 smoke test only when `AI_GATEWAY_API_KEY` is set. CI runs the offline checks on
 Node 22 and 24. A nightly schedule and manual workflow runs also exercise TypeSafe
-and AI Gateway when their repository secrets are configured.
+and Vercel AI Gateway when their repository secrets are configured.
 
 ### Documentation
 

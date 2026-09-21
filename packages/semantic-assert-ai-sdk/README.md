@@ -1,7 +1,7 @@
 # semantic-assert-ai-sdk
 
 [Vercel AI SDK](https://ai-sdk.dev/)'s typed evaluation API as a provider for
-`semantic-assert`. Defaults to [Jev on AI Gateway](https://vercel.com/ai-gateway/models/jev)
+`semantic-assert`. Defaults to [Jev on Vercel AI Gateway](https://vercel.com/ai-gateway/models/jev)
 (`typesafe-ai/jev`) and reads `AI_GATEWAY_API_KEY` from the environment.
 
 ```ts

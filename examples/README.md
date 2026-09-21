@@ -64,7 +64,7 @@ pnpm --filter semantic-assert-examples test:playwright checkout.spec.ts
 ## Run through Vercel AI Gateway
 
 Set `AI_GATEWAY_API_KEY` and select the AI SDK provider. It uses the same Jev
-evaluation model through Vercel's Gateway:
+evaluation model through [Vercel AI Gateway](https://vercel.com/ai-gateway):
 
 ```sh
 EXAMPLE_PROVIDER=ai-sdk pnpm examples:core
@@ -80,7 +80,7 @@ EXAMPLE_PROVIDER=ai-sdk node --env-file=.env --test --test-concurrency=1 example
 EXAMPLE_PROVIDER=ai-sdk node --env-file=.env node_modules/@playwright/test/cli.js test --config=examples/playwright.config.ts
 ```
 
-Live requests require an enabled AI Gateway account and incur provider usage.
+Live requests require an enabled Vercel AI Gateway account and incur provider usage.
 Both live providers report cost only when explicit pricing is configured, so
 the default examples show `n/a`. Choice confidence is the selected option's
 probability; it differs from the direct TypeSafe provider's native confidence.
@@ -139,7 +139,7 @@ From the repository root, after building and installing Chromium:
 # Scripted scores: exercise page capture and the assertion flow without an API key.
 pnpm --filter semantic-assert-examples test:playwright alert-copy.spec.ts
 
-# Actual judgments through AI Gateway, with AI_GATEWAY_API_KEY in .env.
+# Actual judgments through Vercel AI Gateway, with AI_GATEWAY_API_KEY in .env.
 EXAMPLE_PROVIDER=ai-sdk node --env-file=.env node_modules/@playwright/test/cli.js test --config=examples/playwright.config.ts alert-copy.spec.ts
 ```
 
