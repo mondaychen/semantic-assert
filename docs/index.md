@@ -50,6 +50,13 @@ More before-and-after examples:
 2. **Write claims.** Describe the observable behavior. Related claims share one provider request.
 3. **Assert a result.** The judge compares the returned probabilities with your thresholds.
 
+The default judge is [Jev](https://typesafe.ai), TypeSafe's first
+[System One model](https://docs.typesafe.ai/concepts/system-one). It does not
+generate text. It answers yes/no and multiple-choice questions about the supplied
+state with typed results and calibrated probabilities, which is what lets a
+threshold in your code act as a real pass mark. Any `Provider` implementation can
+stand in for it; see [providers](./reference/providers).
+
 Assertions evaluate once by default (`timeoutMs: 0`). A Playwright `region` waits
 for its element to attach, up to 5 s, before that single evaluation. Wait for
 visibility or your application's ready state yourself when content settles later.

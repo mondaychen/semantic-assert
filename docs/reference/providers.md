@@ -17,6 +17,14 @@ The same core judge and Playwright adapter accept any implementation of the
 
 ## TypeSafe
 
+[Jev](https://typesafe.ai) is TypeSafe's first
+[System One model](https://docs.typesafe.ai/concepts/system-one): a model that
+answers narrow questions about supplied state with typed results and calibrated
+probabilities rather than generated text. The core judge's claims become Jev
+Noul questions (probability that a statement holds) and its classifications
+become Choice questions (a distribution over named options). This provider calls
+TypeSafe's API directly.
+
 ```ts
 import { typesafe } from "semantic-assert-typesafe";
 

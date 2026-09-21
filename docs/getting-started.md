@@ -17,6 +17,13 @@ pnpm add semantic-assert semantic-assert-typesafe
 export TYPESAFE_API_KEY="your-api-key"
 ```
 
+The `semantic-assert-typesafe` package talks to [Jev](https://typesafe.ai),
+TypeSafe's System One model. Jev returns typed answers and calibrated
+probabilities to yes/no and multiple-choice questions instead of generating text,
+so the probabilities below can be compared with a threshold directly. Get an API
+key from TypeSafe, or skip ahead to
+[try the flow without one](#try-the-flow-without-an-api-key).
+
 ## Make your first assertion
 
 Save this as `check.mjs`:

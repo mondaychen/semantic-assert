@@ -8,6 +8,20 @@ thresholds, pass/fail decisions, and usage metrics in code.
 [Quick start](https://mengdi.dev/semantic-assert/getting-started.html) ·
 [HTML and Playwright](https://mengdi.dev/semantic-assert/examples/html-alerts.html)
 
+## The judge: Jev
+
+The default judge is [Jev](https://typesafe.ai), the first
+[System One model](https://docs.typesafe.ai/concepts/system-one) from TypeSafe.
+Rather than generating text, Jev answers yes/no and multiple-choice questions
+about supplied state with typed results and calibrated probabilities. That is
+what makes a pass threshold such as `0.8` meaningful: the number is a probability
+the model was trained to get right, not a figure quoted inside prose. Jev is
+newer than the general-purpose chat models most test suites reach for, so it is
+worth knowing that it is purpose-built for this kind of judgment.
+
+The judge does not depend on one vendor. Any implementation of the `Provider`
+interface works, and the Vercel AI SDK adapter reaches Jev through AI Gateway.
+
 ## Packages
 
 | Package                                                           | Purpose                                                                                                        |
