@@ -47,12 +47,12 @@ and the Vercel AI SDK adapter reaches Jev through [Vercel AI Gateway](https://ve
 
 ## Packages
 
-| Package                                                           | Purpose                                                                                                        |
-| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| [semantic-assert](packages/semantic-assert)                       | Provider interface, polling judge, settings, metrics, and deterministic fake provider; no runtime dependencies |
-| [semantic-assert-typesafe](packages/semantic-assert-typesafe)     | TypeSafe Jev provider                                                                                          |
-| [semantic-assert-ai-sdk](packages/semantic-assert-ai-sdk)         | Vercel AI SDK evaluation provider, with Jev through Vercel AI Gateway                                          |
-| [semantic-assert-playwright](packages/semantic-assert-playwright) | Page capture, visual hints, fixtures, matchers, and usage reporter                                             |
+| Package                                                           | npm                                                                                                                                                            | Purpose                                                                                                        |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| [semantic-assert](packages/semantic-assert)                       | [![semantic-assert npm version](https://img.shields.io/npm/v/semantic-assert)](https://www.npmjs.com/package/semantic-assert)                                  | Provider interface, polling judge, settings, metrics, and deterministic fake provider; no runtime dependencies |
+| [semantic-assert-typesafe](packages/semantic-assert-typesafe)     | [![semantic-assert-typesafe npm version](https://img.shields.io/npm/v/semantic-assert-typesafe)](https://www.npmjs.com/package/semantic-assert-typesafe)       | TypeSafe Jev provider                                                                                          |
+| [semantic-assert-ai-sdk](packages/semantic-assert-ai-sdk)         | [![semantic-assert-ai-sdk npm version](https://img.shields.io/npm/v/semantic-assert-ai-sdk)](https://www.npmjs.com/package/semantic-assert-ai-sdk)             | Vercel AI SDK evaluation provider, with Jev through Vercel AI Gateway                                          |
+| [semantic-assert-playwright](packages/semantic-assert-playwright) | [![semantic-assert-playwright npm version](https://img.shields.io/npm/v/semantic-assert-playwright)](https://www.npmjs.com/package/semantic-assert-playwright) | Page capture, visual hints, fixtures, matchers, and usage reporter                                             |
 
 Every package ships ESM, CommonJS, and TypeScript declarations, and you can install
 and version each one independently. Node.js 22 or newer is required. The Playwright
