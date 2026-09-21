@@ -18,7 +18,7 @@ export default defineConfig({
     nav: [
       { text: "Guide", link: "/getting-started" },
       { text: "Examples", link: "/examples/html-alerts" },
-      { text: "GitHub ↗", link: "https://github.com/mondaychen/semantic-assert" },
+      { text: "GitHub", link: "https://github.com/mondaychen/semantic-assert" },
     ],
     sidebar: [
       {
