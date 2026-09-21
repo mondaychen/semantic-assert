@@ -32,6 +32,7 @@ export default defineConfig({
         text: "Before & after",
         items: [
           { text: "HTML alerts & copy changes", link: "/examples/html-alerts" },
+          { text: "Page coherence after navigation", link: "/examples/page-coherence" },
           { text: "Generated support replies", link: "/examples/generated-replies" },
           { text: "Checkout confirmations", link: "/examples/checkout" },
           { text: "Loading vs. empty states", link: "/examples/search-states" },

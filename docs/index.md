@@ -31,6 +31,10 @@ and other JSON, use the framework-independent [core judge](./reference/core).
     <strong>Your test passes. Your bot just promised a refund. →</strong>
     <span>Catch a forbidden promise even when the reply never uses the word “refund”.</span>
   </a>
+  <a href="./examples/page-coherence.html">
+    <strong>The route changed. The tab title didn't. →</strong>
+    <span>Check that the title, navigation, and main content agree after a client-side navigation.</span>
+  </a>
 </div>
 
 More before-and-after examples:
