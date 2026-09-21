@@ -9,8 +9,12 @@ export default defineConfig({
   appearance: false,
   lastUpdated: false,
   sitemap: { hostname: "https://mengdi.dev/semantic-assert/" },
-  head: [["meta", { name: "theme-color", content: "#42b983" }]],
+  head: [
+    ["meta", { name: "theme-color", content: "#42b983" }],
+    ["link", { rel: "icon", type: "image/svg+xml", href: "/semantic-assert/logo.svg" }],
+  ],
   themeConfig: {
+    logo: "/logo.svg",
     nav: [
       { text: "Guide", link: "/getting-started" },
       { text: "Examples", link: "/examples/html-alerts" },

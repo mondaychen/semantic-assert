@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64" role="img" aria-label="semantic-assert" fill="none" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Based on Lucide's message-square-check icon (ISC license). -->
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.7.7 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" stroke="#202b29"/>
+  <path d="m8 11.5 2.5 2.5 5.5-5.5" stroke="#237b56" stroke-width="3"/>
+</svg>
