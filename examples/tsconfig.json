@@ -1,5 +1,12 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": { "types": ["node"] },
-  "include": ["core/**/*.ts", "playwright/**/*.ts", "support/**/*.ts", "playwright.config.ts"]
+  "include": [
+    "core/**/*.ts",
+    "playwright/**/*.ts",
+    "bdd/**/*.ts",
+    "support/**/*.ts",
+    "playwright.config.ts",
+    "playwright-bdd.config.ts"
+  ]
 }

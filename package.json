@@ -23,7 +23,7 @@
     "test:integration": "pnpm build && playwright test",
     "examples:core": "pnpm build && pnpm --filter semantic-assert-examples test",
     "examples:gateway": "pnpm build && node scripts/run-gateway-examples.mjs",
-    "examples:playwright": "pnpm build && pnpm --filter semantic-assert-examples test:playwright"
+    "examples:playwright": "pnpm build && pnpm --filter semantic-assert-examples test:playwright && pnpm --filter semantic-assert-examples test:bdd"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.5",

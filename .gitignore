@@ -5,6 +5,7 @@ docs/.vitepress/cache/
 artifacts/
 test-results/
 playwright-report/
+.features-gen/
 .env
 .env.*
 !.env.example

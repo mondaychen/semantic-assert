@@ -6,12 +6,14 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "test": "pnpm build && node --test --test-concurrency=1 dist/core/*.test.js",
-    "test:playwright": "playwright test"
+    "test:playwright": "playwright test",
+    "test:bdd": "bddgen -c playwright-bdd.config.ts && playwright test -c playwright-bdd.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "1.58.1",
     "@types/node": "^22.15.17",
     "ai": "7.0.107",
+    "playwright-bdd": "9.2.1",
     "semantic-assert": "workspace:*",
     "semantic-assert-ai-sdk": "workspace:*",
     "semantic-assert-playwright": "workspace:*",

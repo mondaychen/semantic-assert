@@ -32,6 +32,7 @@ Fake token counts are sample values, and cost is unknown.
 | [Checkout and error messages](playwright/checkout.spec.ts)      | Extend Playwright fixtures, interact with a page, batch claims, scope capture, and redact data  |
 | [Alert copy changes](playwright/alert-copy.spec.ts)             | Accept two wordings of an HTML alert and reject missing recovery guidance in a scoped region    |
 | [Page coherence](playwright/page-coherence.spec.ts)             | Check that title, breadcrumb, and heading agree on a page named by user input, via `extraState` |
+| [BDD scenarios](bdd/features/saving-changes.feature)            | playwright-bdd steps where each "Then the alert ..." line is the claim; run with `test:bdd`     |
 | [Search page classification](playwright/classification.spec.ts) | Distinguish loading, results, empty, and error states                                           |
 | [Document styling](playwright/visual-matchers.spec.ts)          | Locator matchers, negative claims, and visual hints for highlights and struck-through text      |
 
