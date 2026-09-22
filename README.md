@@ -15,9 +15,9 @@ await judge.expectPageTo("The alert explains how to recover from the error", {
 });
 ```
 
-**[Documentation](https://mengdi.dev/semantic-assert/)** ·
-[Quick start](https://mengdi.dev/semantic-assert/getting-started.html) ·
-[HTML and Playwright](https://mengdi.dev/semantic-assert/examples/html-alerts.html)
+**[Documentation](https://semantic-assert.js.org/)** ·
+[Quick start](https://semantic-assert.js.org/getting-started.html) ·
+[HTML and Playwright](https://semantic-assert.js.org/examples/html-alerts.html)
 
 ## Why a model, and why this one
 
@@ -64,10 +64,10 @@ adapter needs `@playwright/test >=1.50.0` as a peer dependency.
 pnpm add semantic-assert semantic-assert-typesafe
 ```
 
-Then follow the [quick start](https://mengdi.dev/semantic-assert/getting-started.html)
+Then follow the [quick start](https://semantic-assert.js.org/getting-started.html)
 for provider setup and your first assertion. The docs walk through before-and-after
-examples for [HTML alerts after copy edits](https://mengdi.dev/semantic-assert/examples/html-alerts.html)
-and [generated support replies](https://mengdi.dev/semantic-assert/examples/generated-replies.html).
+examples for [HTML alerts after copy edits](https://semantic-assert.js.org/examples/html-alerts.html)
+and [generated support replies](https://semantic-assert.js.org/examples/generated-replies.html).
 For tests you can run from this checkout, see the [examples guide](examples/README.md).
 
 A few things to keep in mind:
