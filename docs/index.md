@@ -11,8 +11,8 @@ description: Assert the meaning of generated responses and HTML pages, with plai
 />
 
 **semantic-assert** lets you assert the requirement instead. Write the claim the
-way the PRD states it, hand it to a model that acts as the judge, and keep the
-pass/fail threshold in your code. Thanks to latest AI, it's fast, cheap, and
+way the PRD states it, hand it to a model that acts as the judge, so your tests
+can be decoupled from HTML tags and the text in them. Thanks to latest AI, it's fast, cheap, and
 reliable.
 
 ```ts
@@ -66,15 +66,6 @@ returns a typed answer with a calibrated probability. That's what lets a thresho
 in your code act as a real pass mark. Any `Provider` implementation can stand in
 for it; see [providers](./reference/providers).
 
-### One evaluation by default
-
-Assertions evaluate once (`timeoutMs: 0`). A Playwright `region` waits up to 5 s
-for its element to attach before that single evaluation, so locator assertions
-still auto-wait. If content settles later than that, wait for it with Playwright
-first. For state that's genuinely changing, opt into repeated checks with a
-positive `timeoutMs`. Usage metrics record every call, its tokens, and the time
-spent waiting on the provider.
-
 ## Where semantic assertions fit
 
 | Use semantic assertions for                        | Keep ordinary assertions for     |
@@ -85,8 +76,7 @@ spent waiting on the provider.
 | Whether a highlighted passage supports a claim     | Exact CSS values and class names |
 
 ::: warning Model judgments are probabilistic
-Calibrate thresholds with both good and bad examples from your own app. A passing
-assertion is the model's assessment, not proof of correctness.
+Try it on your own app first, then decide which threshold fits each scenario.
 :::
 
 ## Get started
