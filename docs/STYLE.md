@@ -105,6 +105,25 @@ this library lets them assert the requirement from the PRD instead. Change one a
 revisit the other. Keep the development details
 complete. That section is for contributors, not marketing.
 
+## The Chinese pages
+
+Pages under `zh/` follow the same voice, section rhythm, and page shapes. Write the
+Chinese a developer would write, not a word-for-word rendering.
+
+- Address the reader as “你”. Keep sentences short and imperative.
+- Use full-width punctuation in prose. Put a space between Chinese and Latin text,
+  numbers, or inline code: “传入 `region` 参数”.
+- No em-dashes (——) here either.
+- Keep product and API names in English: Playwright, Jev, TypeSafe, provider, fixture.
+- Fixed terms: semantic assertion 语义断言, claim 陈述, judge 裁判, threshold 阈值,
+  calibrate 校准, polling 轮询, copy 文案, PRD 产品文档.
+- CI 是“挂了”或“通过了”，不说“红了”“绿了”。测试本身可以说“红了”“绿了”。
+- Callout titles: 你将学到, 陷阱, 深入了解：… . Section titles: 回顾, 下一步,
+  改造前：… , 改造后：… . Table verdicts: 接受, 拒绝.
+- Hooks end in a Chinese ellipsis (……).
+- Leave code blocks untouched, English comments and claims included.
+- Give every heading an explicit `{#id}` that matches the English slug.
+
 ## Checklist before you publish
 
 - [ ] Every section leads with a sentence, then code, then explanation.
@@ -112,4 +131,5 @@ complete. That section is for contributors, not marketing.
 - [ ] Guide and reference pages have "You will learn" and "Recap".
 - [ ] Example pages have a Reject row and a fake-provider run command.
 - [ ] No em-dashes, no hedging words, contractions where a person would use them.
+- [ ] The `zh/` twin of every changed page is updated.
 - [ ] `pnpm format` and `pnpm docs:build` both pass. The build fails on dead links, so a green build means the anchors resolve.

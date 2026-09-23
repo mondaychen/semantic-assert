@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { withBase } from "vitepress";
+import { computed, ref } from "vue";
+import { useData, withBase } from "vitepress";
 
 const props = defineProps<{
   src: string;
@@ -8,6 +8,13 @@ const props = defineProps<{
   /** Shown under the thumbnail. */
   caption?: string;
 }>();
+
+const { lang } = useData();
+const labels = computed(() =>
+  lang.value.startsWith("zh")
+    ? { expand: "放大查看：", hint: "点击放大", close: "关闭" }
+    : { expand: "Expand: ", hint: "Click to enlarge", close: "Close" },
+);
 
 const dialog = ref<HTMLDialogElement | null>(null);
 
@@ -31,14 +38,19 @@ function onDialogClick(event: MouseEvent) {
       type="button"
       class="expandable-image__thumb"
       @click="open"
-      :aria-label="`Expand: ${alt}`"
+      :aria-label="labels.expand + alt"
     >
       <img :src="withBase(props.src)" :alt="alt" loading="lazy" />
-      <span class="expandable-image__hint">Click to enlarge</span>
+      <span class="expandable-image__hint">{{ labels.hint }}</span>
     </button>
     <figcaption v-if="caption">{{ caption }}</figcaption>
     <dialog ref="dialog" class="expandable-image__dialog" @click="onDialogClick">
-      <button type="button" class="expandable-image__close" @click="close" aria-label="Close">
+      <button
+        type="button"
+        class="expandable-image__close"
+        @click="close"
+        :aria-label="labels.close"
+      >
         ×
       </button>
       <img :src="withBase(props.src)" :alt="alt" />

@@ -4,8 +4,8 @@ Assert plain-English claims about captured state, with a model as the judge.
 
 Every exact-string assertion is a bet that nobody will touch the copy.
 `semantic-assert` lets you assert what the PRD actually asks for, such as "the
-alert tells the user how to recover", with a model as the judge and the pass/fail
-threshold in your code.
+alert tells the user how to recover", with a model as the judge, so your tests can
+be decoupled from HTML tags and the text in them.
 
 ```ts
 const alert = page.getByRole("alert");
