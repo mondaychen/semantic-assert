@@ -3,7 +3,7 @@ title: 简介
 description: 用自然语言写下陈述，让模型当裁判，断言生成的回复和 HTML 页面的含义。
 ---
 
-# 测试产品的思路，而不是具体实现。 {#test-what-your-app-means}
+# 需求怎么写，测试就怎么写。 {#test-what-your-app-means}
 
 <ExpandableImage
   src="/comic-exact-match.webp"

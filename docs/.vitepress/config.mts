@@ -102,8 +102,7 @@ export default defineConfig({
       label: "简体中文",
       lang: "zh-CN",
       link: "/zh/",
-      description:
-        "测试产品的思路，而不是具体实现。为 JSON、生成的回复和 Playwright 页面提供语义断言。",
+      description: "需求怎么写，测试就怎么写。为 JSON、生成的回复和 Playwright 页面提供语义断言。",
       themeConfig: {
         nav: [
           { text: "指南", link: "/zh/getting-started" },
