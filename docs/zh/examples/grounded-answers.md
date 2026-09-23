@@ -47,13 +47,13 @@ await judge.expectClaims(
 
 ## 抓住看似合理却没有依据的建议 {#catch-plausible-but-unsupported-advice}
 
-| 生成的回答                                                     | 预期结果 | 原因                           |
-| -------------------------------------------------------------- | -------- | ------------------------------ |
-| “因为你已经拆封了耳机，按照这项政策不能退货，即使在 30 天内。” | 接受     | 把条件应用到了顾客的情况上。   |
-| “30 天退货期只适用于未拆封的耳机。你这副已拆封的不符合条件。”  | 接受     | 正确的改写。                   |
-| “可以，你可以在 30 天内退回已拆封的耳机。”                     | 拒绝     | 忽略了未拆封这个条件。         |
-| “已拆封的耳机支付重新上架费后可以退货。”                       | 拒绝     | 编造了一个例外。               |
-| “我们的退货期是 30 天。”                                       | 拒绝     | 没有回答顾客能不能退货的问题。 |
+| 生成的回答                                                                                       | 预期结果 | 原因                           |
+| ------------------------------------------------------------------------------------------------ | -------- | ------------------------------ |
+| “Because you've opened the headphones, this policy doesn't allow a return, even within 30 days.” | 接受     | 把条件应用到了顾客的情况上。   |
+| “The 30-day return window covers unopened headphones only. Your opened pair isn't eligible.”     | 接受     | 正确的改写。                   |
+| “Yes, you can return your opened headphones within 30 days.”                                     | 拒绝     | 忽略了未拆封这个条件。         |
+| “Opened headphones are returnable if you pay a restocking fee.”                                  | 拒绝     | 编造了一个例外。               |
+| “Our return window is 30 days.”                                                                  | 拒绝     | 没有回答顾客能不能退货的问题。 |
 
 用这些预期结果来校准真实的 provider。假 provider 的脚本化分数无法告诉你任何关于回答本身的信息。
 
@@ -62,7 +62,7 @@ await judge.expectClaims(
 把 `policy` 换成模型拿到的来源文本，把 `question` 换成测试顾客的请求，把 `answer` 换成生成的回复。
 
 ::: warning 陷阱
-把来源放在捕获的状态里。如果只捕获回答，裁判就没有可以对照的东西，“正确应用了政策”就成了瞎猜。
+把来源放在捕获的状态里。如果只捕获回答，裁判就没有可以对照的东西，“correctly applies the policy”就成了瞎猜。
 :::
 
 这里检查的是回答与所给来源是否一致，而不是来源本身是否最新、是否符合事实，也不能证明检索找到了所有相关文档。检索覆盖率和精确的文档 ID 要单独测试。
