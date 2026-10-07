@@ -3,6 +3,7 @@ import { FakeProvider } from "../packages/semantic-assert/dist/index.js";
 import { PageJudge } from "../packages/semantic-assert-playwright/dist/index.js";
 import { typesafe } from "../packages/semantic-assert-typesafe/dist/index.js";
 import { aiSdk } from "../packages/semantic-assert-ai-sdk/dist/index.js";
+import { openaiDecisions } from "../packages/semantic-assert-openai/dist/index.js";
 
 test("captures a real page and judges it with a deterministic provider", async ({
   page,
@@ -54,6 +55,27 @@ test.describe("live provider", () => {
     const judge = new PageJudge(page, testInfo, typesafe());
     await judge.expectPageTo("The page confirms that the project was saved successfully");
     await judge.expectPageNotTo("The page reports that the project could not be saved");
+    await judge.attachMetrics();
+  });
+});
+
+test.describe("live OpenAI Decisions provider", () => {
+  test.skip(!process.env.OPENAI_API_KEY, "Set OPENAI_API_KEY to run the OpenAI smoke test");
+  test("OpenAI Decisions judges a local page", async ({ page }, testInfo) => {
+    await page.setContent(
+      "<main><h1>Projects</h1><p>Your project was saved successfully.</p></main>",
+    );
+    const judge = new PageJudge(page, testInfo, openaiDecisions());
+    await judge.expectPage([
+      { claim: "The page confirms that the project was saved successfully" },
+      { claim: "The page reports that the project could not be saved", expected: false },
+    ]);
+    const result = await judge.classifyPage("What happened to the project?", {
+      saved: "The project was saved successfully.",
+      failed: "Saving the project failed.",
+    });
+    expect(result.choice).toBe("saved");
+    expect(result.confidence).toBeGreaterThanOrEqual(0.8);
     await judge.attachMetrics();
   });
 });

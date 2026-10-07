@@ -1,23 +1,24 @@
 ---
 title: Provider 与配置
-description: 选择 TypeSafe、Vercel AI Gateway 或假 provider，并配置阈值、超时、重试和用量估算。
+description: 选择 TypeSafe、Vercel AI Gateway、OpenAI Decisions 或假 provider，并配置阈值、超时、重试和用量估算。
 ---
 
 # Provider 与配置 {#providers-configuration}
 
-裁判和 Playwright 适配器接受任何实现了 `Provider` 接口的对象。项目自带两个 provider，另外还有一个假 provider，用来测试流程本身。
+裁判和 Playwright 适配器接受任何实现了 `Provider` 接口的对象。项目自带三个 provider，另外还有一个假 provider，用来测试流程本身。
 
 | 包                           | 作用                                                      |
 | ---------------------------- | --------------------------------------------------------- |
 | `semantic-assert`            | 核心裁判、设置、指标，以及可编排脚本的 `FakeProvider`     |
 | `semantic-assert-typesafe`   | TypeSafe Jev provider                                     |
 | `semantic-assert-ai-sdk`     | AI SDK 评估 provider，默认通过 Vercel AI Gateway 调用 Jev |
+| `semantic-assert-openai`     | OpenAI Decisions API provider                             |
 | `semantic-assert-playwright` | 页面捕获、fixture、matcher 和报告                         |
 
 ::: info 你将学到
 
 - 什么是 Jev，以及陈述如何对应到它的问题
-- 如何配置 TypeSafe 和 Vercel AI Gateway provider
+- 如何配置 TypeSafe、Vercel AI Gateway 和 OpenAI Decisions provider
 - 如何为假 provider 编排脚本
 - 有哪些裁判设置，以及它们的默认值从哪里来
 - 为什么要先校准阈值，再信任它
@@ -70,6 +71,28 @@ const provider = aiSdk({
 
 适配器要求 `ai >=7.0.107 <8`。评估 API 还处于实验阶段，`7.0.107` 是本仓库测试所用的版本。要估算费用，设置 `pricing: { inputUsdPerMtok, outputUsdPerMtok }`。两个费率和两个 token 计数都齐全时，才会显示估算值。
 
+## OpenAI Decisions {#openai-decisions}
+
+用 OpenAI 适配器，通过 OpenAI 的 [Decisions API](https://developers.openai.com/api/docs/guides/decisions) 来判断：
+
+```ts
+import { openaiDecisions } from "semantic-assert-openai";
+
+const provider = openaiDecisions({
+  model: "gpt-6-luna",
+  timeoutMs: 10_000,
+  maxRetries: 0,
+});
+```
+
+和 Jev 一样，Decisions 返回带类型的答案和概率，而不是生成的文本。陈述会变成 `predicate` 问题，分类会变成 `choice` 问题。key 默认读取 `OPENAI_API_KEY`，`gpt-6-luna` 是默认模型，也是唯一支持的模型。这个 API 还在公开测试阶段，没有权限的组织会收到 HTTP 403。
+
+重试由官方 `openai` SDK 负责，默认两次。`timeoutMs` 是单次尝试的超时。如果模型拒绝回答某个问题，调用会抛出 `DecisionRefusalError`，不会去猜答案。要估算费用，设置 `usdPerMtokInput` 或 `OPENAI_DECISIONS_USD_PER_MTOK_INPUT`。Decisions 只按输入 token 计费。
+
+::: warning 陷阱
+`gpt-6-luna` 按字面理解陈述。只有一句 “Try again.” 时，它不认为这算告诉了用户如何恢复，Jev 则认为算。切换之前，先跑一遍你的校准集，并让陈述准确说明文案必须做到什么。
+:::
+
 ## 假 provider {#fake-provider}
 
 编排裁判收到的分数：
@@ -112,7 +135,8 @@ const provider = new FakeProvider({
 ## 回顾 {#recap}
 
 - Jev 是默认的裁判，可以直接通过 TypeSafe 调用，也可以通过 Vercel AI Gateway 调用。
-- 两个 provider 处理重试的方式不同。设置超时时要考虑到这一点。
+- OpenAI 的 Decisions API 是另一个可选的裁判，通过 `semantic-assert-openai` 使用。
+- 各个 provider 处理重试的方式不同。设置超时时要考虑到这一点。
 - `FakeProvider` 编排分数并记录请求，用于测试流程。
 - 设置的解析顺序是覆盖值、环境变量、默认值。
 - 在信任一次全绿的运行之前，先用你自己的数据校准阈值。

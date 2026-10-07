@@ -4,7 +4,8 @@ on:
   pull_request:
   workflow_dispatch:
   schedule:
-    # Nightly, so drift in the experimental AI SDK or the TypeSafe API
+    # Nightly, so drift in the experimental AI SDK, the TypeSafe API, or
+    # OpenAI's beta Decisions API
     # shows up before a release does.
     - cron: "17 3 * * *"
 permissions:
@@ -37,19 +38,20 @@ jobs:
     env:
       TYPESAFE_API_KEY: ${{ secrets.TYPESAFE_API_KEY }}
       AI_GATEWAY_API_KEY: ${{ secrets.AI_GATEWAY_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - uses: actions/checkout@v4
-        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != ''
+        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != '' || env.OPENAI_API_KEY != ''
       - uses: pnpm/action-setup@v4
-        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != ''
+        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != '' || env.OPENAI_API_KEY != ''
       - uses: actions/setup-node@v4
-        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != ''
+        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != '' || env.OPENAI_API_KEY != ''
         with:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != ''
+        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != '' || env.OPENAI_API_KEY != ''
       - run: pnpm exec playwright install --with-deps chromium
-        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != ''
+        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != '' || env.OPENAI_API_KEY != ''
       - run: pnpm test:integration
-        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != ''
+        if: env.TYPESAFE_API_KEY != '' || env.AI_GATEWAY_API_KEY != '' || env.OPENAI_API_KEY != ''

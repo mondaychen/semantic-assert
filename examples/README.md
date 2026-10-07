@@ -39,7 +39,7 @@ Fake token counts are sample values, and cost is unknown.
 The shared [JSON judge](support/json-judge.ts) builds a core `Judge` with the
 built-in templates, which describe arbitrary JSON. The Playwright adapter
 applies its own templates naming web-page fields such as `aria_snapshot`. The
-[provider helper](support/provider.ts) selects fake, TypeSafe, or AI SDK explicitly.
+[provider helper](support/provider.ts) selects fake, TypeSafe, AI SDK, or OpenAI Decisions explicitly.
 
 ## Run with TypeSafe
 
@@ -61,6 +61,21 @@ After building, run an individual file from the repository root:
 pnpm --filter semantic-assert-examples exec node --test dist/core/generated-response.test.js
 pnpm --filter semantic-assert-examples test:playwright checkout.spec.ts
 ```
+
+## Run with OpenAI Decisions
+
+Set `OPENAI_API_KEY` and select the OpenAI provider. It judges with OpenAI's
+[Decisions API](https://developers.openai.com/api/docs/guides/decisions) and
+`gpt-6-luna`:
+
+```sh
+EXAMPLE_PROVIDER=openai pnpm examples:core
+EXAMPLE_PROVIDER=openai pnpm examples:playwright
+```
+
+The examples' thresholds were calibrated against Jev, and every example also
+passes with `gpt-6-luna`. Probabilities from the two models aren't on the same
+scale, so recalibrate on your own examples before you switch providers.
 
 ## Run through Vercel AI Gateway
 

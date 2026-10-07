@@ -12,7 +12,7 @@ import { exampleProvider } from "../../support/provider.js";
  * play out deterministically without an API key. A live provider reads the text.
  */
 function scriptedByContent(state: JsonValue) {
-  const complete = /try again|another try/i.test(JSON.stringify(state));
+  const complete = /save again|try again/i.test(JSON.stringify(state));
   return { claim_0: complete ? 0.97 : 0.03 };
 }
 

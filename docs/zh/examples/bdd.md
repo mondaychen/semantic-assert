@@ -14,7 +14,7 @@ description: 用 playwright-bdd 把 Gherkin 步骤变成语义陈述，让 featu
 ```gherkin
 Scenario: A failed save is explained
   Given the editor failed to save the user's changes
-  Then I should see the message "We couldn't save your changes. Try again."
+  Then I should see the message "We couldn't save your changes. Check your connection, then select Save again."
 ```
 
 ```ts
@@ -77,7 +77,7 @@ Gherkin 让校准集成为规格的一部分。对于不能通过的场景，使
 
 ```gherkin
 Scenario: A reworded alert still meets the requirement
-  Given the editor shows the alert "Your changes haven't been saved. Please give it another try."
+  Given the editor shows the alert "Your changes haven't been saved. Once you're back online, press Save to try again."
   Then the alert tells the user their changes were not saved
   And the alert tells the user how to recover
 

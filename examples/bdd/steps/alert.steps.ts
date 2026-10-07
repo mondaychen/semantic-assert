@@ -13,7 +13,10 @@ async function renderEditor(page: Page, alertCopy: string) {
 }
 
 Given("the editor failed to save the user's changes", async ({ page }) => {
-  await renderEditor(page, "We couldn't save your changes. Try again.");
+  await renderEditor(
+    page,
+    "We couldn't save your changes. Check your connection, then select Save again.",
+  );
 });
 
 Given("the editor shows the alert {string}", async ({ page }, copy: string) => {

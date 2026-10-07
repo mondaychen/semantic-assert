@@ -1,0 +1,70 @@
+{
+  "name": "semantic-assert-openai",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "OpenAI Decisions API provider for semantic-assert, with per-call attempts and cost.",
+  "keywords": [
+    "semantic-assert",
+    "openai",
+    "decisions",
+    "provider"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mondaychen/semantic-assert.git",
+    "directory": "packages/semantic-assert-openai"
+  },
+  "homepage": "https://github.com/mondaychen/semantic-assert/tree/main/packages/semantic-assert-openai#readme",
+  "bugs": {
+    "url": "https://github.com/mondaychen/semantic-assert/issues"
+  },
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "lint": "oxlint --type-aware --deny-warnings .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepack": "pnpm run build"
+  },
+  "dependencies": {
+    "openai": "^7.30.0",
+    "semantic-assert": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.17",
+    "oxlint": "1.50.0",
+    "oxlint-tsgolint": "^0.17.3",
+    "tsup": "^8.5.0",
+    "typescript": "5.7.3",
+    "vitest": "^4.1.11"
+  },
+  "module": "./dist/index.js",
+  "files": [
+    "dist",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

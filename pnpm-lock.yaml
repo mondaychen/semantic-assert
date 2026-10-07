@@ -50,6 +50,9 @@ importers:
       semantic-assert-ai-sdk:
         specifier: workspace:*
         version: link:../packages/semantic-assert-ai-sdk
+      semantic-assert-openai:
+        specifier: workspace:*
+        version: link:../packages/semantic-assert-openai
       semantic-assert-playwright:
         specifier: workspace:*
         version: link:../packages/semantic-assert-playwright
@@ -96,6 +99,34 @@ importers:
       ai:
         specifier: 7.0.107
         version: 7.0.107(zod@4.6.5)
+      oxlint:
+        specifier: 1.50.0
+        version: 1.50.0(oxlint-tsgolint@0.17.4)
+      oxlint-tsgolint:
+        specifier: ^0.17.3
+        version: 0.17.4
+      tsup:
+        specifier: ^8.5.0
+        version: 8.5.1(postcss@8.5.28)(typescript@5.7.3)
+      typescript:
+        specifier: 5.7.3
+        version: 5.7.3
+      vitest:
+        specifier: ^4.1.11
+        version: 4.1.11(@types/node@22.20.4)(vite@8.3.0(@types/node@22.20.4)(esbuild@0.27.7))
+
+  packages/semantic-assert-openai:
+    dependencies:
+      openai:
+        specifier: ^7.30.0
+        version: 7.30.0(undici@7.29.1)(zod@4.6.5)
+      semantic-assert:
+        specifier: workspace:^
+        version: link:../semantic-assert
+    devDependencies:
+      '@types/node':
+        specifier: ^22.15.17
+        version: 22.20.4
       oxlint:
         specifier: 1.50.0
         version: 1.50.0(oxlint-tsgolint@0.17.4)
@@ -1855,6 +1886,30 @@ packages:
 
   oniguruma-to-es@3.1.1:
     resolution: {integrity: sha512-bUH8SDvPkH3ho3dvwJwfonjlQ4R80vjyvrU8YpxuROddv55vAEJrTuCuCVUhhsHbtlD9tGGbaNApGQckXhS8iQ==}
+
+  openai@7.30.0:
+    resolution: {integrity: sha512-tvvcPdhS56B/79o0mJS5h4JndAov5Sz78T7CFl4gJ+C9S3GoSqHNLO6lG/8kdK+/c13zWEI97Srf66ar0V242g==}
+    engines: {node: '>=22.0.0'}
+    peerDependencies:
+      '@aws-sdk/credential-provider-node': '>=3.972.0 <4'
+      '@smithy/hash-node': '>=4.3.0 <5'
+      '@smithy/signature-v4': '>=5.4.0 <6'
+      undici: '>=5 <9'
+      ws: ^8.21.0
+      zod: ^3.25 || ^4.0
+    peerDependenciesMeta:
+      '@aws-sdk/credential-provider-node':
+        optional: true
+      '@smithy/hash-node':
+        optional: true
+      '@smithy/signature-v4':
+        optional: true
+      undici:
+        optional: true
+      ws:
+        optional: true
+      zod:
+        optional: true
 
   outdent@0.5.0:
     resolution: {integrity: sha512-/jHxFIzoMXdqPzTaCpFzAAWhpkSjZPF4Vsn6jAfNpmbH/ymsmd7Qc6VE9BGn0L6YMj6uwpQLxCECpus4ukKS9Q==}
@@ -3921,6 +3976,11 @@ snapshots:
       emoji-regex-xs: 1.0.0
       regex: 6.1.0
       regex-recursion: 6.0.2
+
+  openai@7.30.0(undici@7.29.1)(zod@4.6.5):
+    optionalDependencies:
+      undici: 7.29.1
+      zod: 4.6.5
 
   outdent@0.5.0: {}
 
