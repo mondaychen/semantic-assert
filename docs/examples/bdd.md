@@ -16,7 +16,7 @@ exact copy in it.
 ```gherkin
 Scenario: A failed save is explained
   Given the editor failed to save the user's changes
-  Then I should see the message "We couldn't save your changes. Try again."
+  Then I should see the message "We couldn't save your changes. Check your connection, then select Save again."
 ```
 
 ```ts
@@ -90,7 +90,7 @@ tag for the scenario that must not pass:
 
 ```gherkin
 Scenario: A reworded alert still meets the requirement
-  Given the editor shows the alert "Your changes haven't been saved. Please give it another try."
+  Given the editor shows the alert "Your changes haven't been saved. Once you're back online, press Save to try again."
   Then the alert tells the user their changes were not saved
   And the alert tells the user how to recover
 

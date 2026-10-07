@@ -1,12 +1,12 @@
 ---
 title: Providers & configuration
-description: Choose TypeSafe, Vercel AI Gateway, or a fake provider and configure thresholds, timeouts, retries, and usage estimates.
+description: Choose TypeSafe, Vercel AI Gateway, OpenAI Decisions, or a fake provider and configure thresholds, timeouts, retries, and usage estimates.
 ---
 
 # Providers & configuration
 
 The judge and the Playwright adapter accept anything that implements the
-`Provider` interface. Two providers ship with the project, plus a fake for testing
+`Provider` interface. Three providers ship with the project, plus a fake for testing
 the flow itself.
 
 | Package                      | Role                                                                    |
@@ -14,12 +14,13 @@ the flow itself.
 | `semantic-assert`            | Core judge, settings, metrics, and scripted `FakeProvider`              |
 | `semantic-assert-typesafe`   | TypeSafe Jev provider                                                   |
 | `semantic-assert-ai-sdk`     | AI SDK evaluation provider, defaulting to Jev through Vercel AI Gateway |
+| `semantic-assert-openai`     | OpenAI Decisions API provider                                           |
 | `semantic-assert-playwright` | Page capture, fixtures, matchers, and reporting                         |
 
 ::: info You will learn
 
 - What Jev is and how claims map onto its questions
-- How to configure the TypeSafe and Vercel AI Gateway providers
+- How to configure the TypeSafe, Vercel AI Gateway, and OpenAI Decisions providers
 - How to script a fake provider
 - Which judge settings exist and where their defaults come from
 - Why you should calibrate thresholds before trusting them
@@ -89,6 +90,39 @@ The adapter requires `ai >=7.0.107 <8`. The evaluation API is experimental, and
 `pricing: { inputUsdPerMtok, outputUsdPerMtok }`. Both rates and both token counts
 are needed before an estimate appears.
 
+## OpenAI Decisions
+
+Use the OpenAI adapter to judge with OpenAI's
+[Decisions API](https://developers.openai.com/api/docs/guides/decisions):
+
+```ts
+import { openaiDecisions } from "semantic-assert-openai";
+
+const provider = openaiDecisions({
+  model: "gpt-6-luna",
+  timeoutMs: 10_000,
+  maxRetries: 0,
+});
+```
+
+Like Jev, Decisions returns typed answers with probabilities instead of generated
+text. Claims become `predicate` questions and classifications become `choice`
+questions. The key defaults to `OPENAI_API_KEY`, and `gpt-6-luna` is the default
+and only supported model. The API is in public beta, so an organization without
+access gets HTTP 403.
+
+The official `openai` SDK owns retries, two by default. `timeoutMs` applies per
+attempt. If the model declines a question, the call throws a
+`DecisionRefusalError` rather than guessing. To estimate cost, set
+`usdPerMtokInput` or `OPENAI_DECISIONS_USD_PER_MTOK_INPUT`. Decisions bills input
+tokens only.
+
+::: warning Pitfall
+`gpt-6-luna` reads claims literally. It doesn't count a bare "Try again." as
+telling the user how to recover, where Jev does. Run your calibration set before
+you switch, and write claims that say exactly what the copy must do.
+:::
+
 ## Fake provider
 
 Script the scores the judge receives:
@@ -148,7 +182,8 @@ Recheck any confidence threshold when you switch between them.
 ## Recap
 
 - Jev is the default judge, reached directly through TypeSafe or through Vercel AI Gateway.
-- The two providers handle retries differently. Set timeouts with that in mind.
+- OpenAI's Decisions API is the alternative judge, through `semantic-assert-openai`.
+- The providers handle retries differently. Set timeouts with that in mind.
 - `FakeProvider` scripts scores and records requests for tests of the flow.
 - Settings resolve from overrides, then environment, then defaults.
 - Calibrate thresholds on your own data before trusting a green run.

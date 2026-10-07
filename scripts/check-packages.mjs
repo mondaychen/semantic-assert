@@ -14,6 +14,7 @@ const names = [
   "semantic-assert-typesafe",
   "semantic-assert-playwright",
   "semantic-assert-ai-sdk",
+  "semantic-assert-openai",
 ];
 const tarballs = [];
 for (const name of names) {
@@ -83,6 +84,7 @@ for (const load of [(name) => import(name), async (name) => require(name)]) {
   const core = await load('semantic-assert');
   const { typesafe } = await load('semantic-assert-typesafe');
   const { aiSdk } = await load('semantic-assert-ai-sdk');
+  const { openaiDecisions } = await load('semantic-assert-openai');
   const adapter = await load('semantic-assert-playwright');
   const reporter = await load('semantic-assert-playwright/reporter');
   assert.equal(typeof typesafe, 'function');
@@ -112,6 +114,20 @@ for (const load of [(name) => import(name), async (name) => require(name)]) {
   const gatewayResult = await gatewayProvider.evaluate('Saved', { claim_0: core.noul('The operation succeeded') });
   assert.equal(gatewayResult.answers.claim_0.noul, 0.99);
   assert.equal(gatewayResult.attempts, 1);
+  const openaiProvider = openaiDecisions({
+    apiKey: 'test',
+    fetch: async (url) => {
+      assert.equal(url, 'https://api.openai.com/v1/decisions');
+      return Response.json({
+        model: 'gpt-6-luna',
+        answers: [{ type: 'predicate', name: 'claim_0', probability: 0.99 }],
+        usage: { input_tokens: 100, output_tokens: 0 },
+      });
+    },
+  });
+  const openaiResult = await openaiProvider.evaluate('Saved', { claim_0: core.noul('The operation succeeded') });
+  assert.equal(openaiResult.answers.claim_0.noul, 0.99);
+  assert.equal(openaiResult.attempts, 1);
   assert.equal(typeof adapter.PageJudge, 'function');
   assert.equal(typeof reporter.default, 'function');
   assert.equal(adapter.Judge, core.Judge);
@@ -127,13 +143,16 @@ const types = `
 import { FakeProvider, Judge, resolveJudgeSettings, type Provider } from 'semantic-assert';
 import { typesafe } from 'semantic-assert-typesafe';
 import { aiSdk, type AiSdkProviderOptions } from 'semantic-assert-ai-sdk';
+import { openaiDecisions, type OpenAIDecisionsProviderOptions } from 'semantic-assert-openai';
 import { PageJudge, judgeFixtures, createJudgeExpect } from 'semantic-assert-playwright';
 import UsageReporter from 'semantic-assert-playwright/reporter';
 const provider: Provider = typesafe({ apiKey: 'test' });
 const sdkOptions: AiSdkProviderOptions = { model: 'typesafe-ai/jev' };
 const sdkProvider: Provider = aiSdk(sdkOptions);
+const openaiOptions: OpenAIDecisionsProviderOptions = { model: 'gpt-6-luna' };
+const openaiProvider: Provider = openaiDecisions(openaiOptions);
 new Judge({ provider: new FakeProvider(), settings: resolveJudgeSettings() });
-void [provider, sdkProvider, PageJudge, judgeFixtures, createJudgeExpect, UsageReporter];
+void [provider, sdkProvider, openaiProvider, PageJudge, judgeFixtures, createJudgeExpect, UsageReporter];
 `;
 for (const extension of ["mts", "cts"]) {
   writeFileSync(join(consumer, `consumer.${extension}`), types);

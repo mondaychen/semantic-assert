@@ -8,6 +8,7 @@ import {
 } from "semantic-assert";
 import { typesafe } from "semantic-assert-typesafe";
 import { aiSdk } from "semantic-assert-ai-sdk";
+import { openaiDecisions } from "semantic-assert-openai";
 import { requestDelayMs, singlePass } from "./timing.js";
 
 function paced(provider: Provider): Provider {
@@ -34,7 +35,15 @@ export function exampleProvider(fake: FakeProviderOptions): Provider {
     // Smoke and paced runs do not spend extra requests on SDK retries.
     return paced(aiSdk({ maxRetries: singlePass || requestDelayMs > 0 ? 0 : undefined }));
   }
-  if (mode !== "typesafe") throw new Error("EXAMPLE_PROVIDER must be fake, typesafe, or ai-sdk");
+  if (mode === "openai") {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("Set OPENAI_API_KEY before using EXAMPLE_PROVIDER=openai");
+    }
+    return paced(openaiDecisions({ maxRetries: singlePass || requestDelayMs > 0 ? 0 : undefined }));
+  }
+  if (mode !== "typesafe") {
+    throw new Error("EXAMPLE_PROVIDER must be fake, typesafe, ai-sdk, or openai");
+  }
   if (!process.env.TYPESAFE_API_KEY) {
     throw new Error("Set TYPESAFE_API_KEY before using EXAMPLE_PROVIDER=typesafe");
   }
