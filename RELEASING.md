@@ -1,10 +1,11 @@
 # Publishing packages
 
-The repository root and examples workspace are private. Only the four packages
+The repository root and examples workspace are private. Only the five packages
 under `packages/` are published: `semantic-assert`, `semantic-assert-typesafe`,
-`semantic-assert-ai-sdk`, and `semantic-assert-playwright`. Version `0.1.0` of
-each was published on 2026-09-19; releases since are tracked independently with
-Changesets. The source is licensed under the Apache License, Version 2.0.
+`semantic-assert-ai-sdk`, `semantic-assert-openai`, and `semantic-assert-playwright`.
+Version `0.1.0` of the first four was published on 2026-09-19, and
+`semantic-assert-openai` started at `0.1.0` later. Releases are tracked
+independently with Changesets. The source is licensed under the Apache License, Version 2.0.
 
 Before any release, run `pnpm install --frozen-lockfile`, `pnpm check`,
 `pnpm check:packages`, and the browser smoke test described in the README.
@@ -19,7 +20,7 @@ Before any release, run `pnpm install --frozen-lockfile`, `pnpm check`,
    and packed consumers before Changesets publishes unpublished package versions.
 
 Use pnpm for manual packing or publishing. It rewrites `workspace:^` dependencies
-to ordinary semver ranges in the tarball. The TypeSafe, AI SDK, and Playwright packages
+to ordinary semver ranges in the tarball. The TypeSafe, AI SDK, OpenAI, and Playwright packages
 depend on the separately published core; each tarball contains only its own build,
 README, changelog, manifest, and license. `prepack` rebuilds the selected package. Build the
 workspace first if packing an adapter directly from a clean checkout.

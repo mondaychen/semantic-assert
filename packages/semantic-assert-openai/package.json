@@ -1,6 +1,6 @@
 {
   "name": "semantic-assert-openai",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "description": "OpenAI Decisions API provider for semantic-assert, with per-call attempts and cost.",
   "keywords": [
